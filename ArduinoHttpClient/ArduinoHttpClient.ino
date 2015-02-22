@@ -13,15 +13,16 @@
 #include <Ethernet.h>
 
 //static port number outside the range of most reserved port numbers
-#define SERVER_PORT 63314
+#define SERVER_PORT 3000
 
 // MAC address for Ethernet Shield.
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x47, 0x26 };
 
 // IP for the server:
-IPAddress server(192,168,1,2);
-//IPAddress server(192,168,0,114);
+//IPAddress server(192,168,1,2);
+//IPAddress server(192,168,2,5);
 //IPAddress server(169,254,176,70);
+char server[] = "192.168.2.5";
 
 // Set the static IP address to use if the DHCP fails to assign
 IPAddress ip(192,168,2,4);
@@ -103,11 +104,26 @@ void ProcessUART2(char where) {
       Serial2.readBytes(&checksum, 1);
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
-            piServer.print("Temperature2: ");
+            piServer.println("POST /arduino HTTP/1.1");
+            piServer.println("Host: localhost:3000");
+            piServer.println("Cache-Control: no-cache");
+            piServer.println("Content-Type: application/x-www-form-urlencoded");
+            piServer.print("temperature=");
             piServer.print((*(uint16_t *)temperature) / 10.0, 1);
-            piServer.print(" °C\tHumidity2: ");
+            piServer.print("&humidity=");
             piServer.print((*(uint16_t *)humidity) / 10.0, 1);
-            piServer.print("%\n\r");
+            Serial.println("Sent.");
+            
+//            client.println("GET / HTTP/1.1");
+//            client.println("Host: 192.168.2.5");
+//            client.println("Connection: close");
+//            client.println();
+
+//            piServer.print("Temperature2: ");
+//            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
+//            piServer.print(" °C\tHumidity2: ");
+//            piServer.print((*(uint16_t *)humidity) / 10.0, 1);
+//            piServer.print("%\n\r");
          }
          else {
             Serial.print("Temperature2: ");
