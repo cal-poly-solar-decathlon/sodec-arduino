@@ -12,6 +12,10 @@
 #include <SPI.h>
 #include <Ethernet.h>
 
+//void postToServer(float humidity, float temperature, char *room);
+void postToServer(float humidity, float temperature);
+void setupNetworkConnection();
+
 //static port number outside the range of most reserved port numbers
 #define SERVER_PORT 3000
 
@@ -22,7 +26,8 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x47, 0x26 };
 //IPAddress server(192,168,1,2);
 //IPAddress server(192,168,2,5);
 //IPAddress server(169,254,176,70);
-char server[] = "192.168.2.5";
+IPAddress server(192,168,2,2);  
+//char server[] = "192.168.2.5";
 
 // Set the static IP address to use if the DHCP fails to assign
 IPAddress ip(192,168,2,4);
@@ -35,6 +40,7 @@ char type,
      checksum;
 char temperature[2],
      humidity[2];
+int disconnectCount;
 
 /* checksumCheck
  * return equality of received checksum value and calculated checksum
@@ -69,11 +75,7 @@ void ProcessUART1(char where) {
       //verify checksum
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {          //send ASCII data to server
-            piServer.print("Temperature1: ");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
-            piServer.print(" °C\tHumidity1: ");
-            piServer.print((*(uint16_t *)humidity) / 10.0, 1);
-            piServer.print("%\n\r");
+            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
          }
          else {                       //send ASCII data to terminal
             Serial.print("Temperature1: ");
@@ -90,7 +92,7 @@ void ProcessUART1(char where) {
 }
 
 /* ProcessUART2
- * read from UART2 (same as ProcessUART1
+ * read from UART2 (same as ProcessUART1)
  */
 void ProcessUART2(char where) {
    Serial2.readBytes(&type, 1);
@@ -104,26 +106,7 @@ void ProcessUART2(char where) {
       Serial2.readBytes(&checksum, 1);
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
-            piServer.println("POST /arduino HTTP/1.1");
-            piServer.println("Host: localhost:3000");
-            piServer.println("Cache-Control: no-cache");
-            piServer.println("Content-Type: application/x-www-form-urlencoded");
-            piServer.print("temperature=");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
-            piServer.print("&humidity=");
-            piServer.print((*(uint16_t *)humidity) / 10.0, 1);
-            Serial.println("Sent.");
-            
-//            client.println("GET / HTTP/1.1");
-//            client.println("Host: 192.168.2.5");
-//            client.println("Connection: close");
-//            client.println();
-
-//            piServer.print("Temperature2: ");
-//            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
-//            piServer.print(" °C\tHumidity2: ");
-//            piServer.print((*(uint16_t *)humidity) / 10.0, 1);
-//            piServer.print("%\n\r");
+            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
          }
          else {
             Serial.print("Temperature2: ");
@@ -140,7 +123,7 @@ void ProcessUART2(char where) {
 }
 
 /* ProcessUART3
- * read from UART3 (same as ProcessUART1
+ * read from UART3 (same as ProcessUART1)
  */
 void ProcessUART3(char where) {
    Serial3.readBytes(&type, 1);
@@ -154,11 +137,7 @@ void ProcessUART3(char where) {
       Serial3.readBytes(&checksum, 1);
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
-            piServer.print("Temperature3: ");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
-            piServer.print(" °C\tHumidity3: ");
-            piServer.print((*(uint16_t *)humidity) / 10.0, 1);
-            piServer.print("%\n\r");
+            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
          }
          else {
             Serial.print("Temperature3: ");
@@ -174,33 +153,72 @@ void ProcessUART3(char where) {
    }
 }
 
+void postToServer(float humidity, float temperature)
+{
+  
+  char tempStr[6], humStr[6];
+  char postString[30];
+  String data;
+    
+  dtostrf(temperature, 4, 2, tempStr);
+  dtostrf(humidity, 4, 2, humStr);
+
+  sprintf(postString, "humidity=%s&temperature=%s", humStr, tempStr);
+    
+  data = String(postString);
+
+  // Make a HTTP request:
+  piServer.println("POST /arduino HTTP/1.1");
+  piServer.println("Host: 192.168.2.2:3000");
+  piServer.println("Content-Type: application/x-www-form-urlencoded");
+  piServer.print("Content-Length: ");
+  piServer.println(data.length());
+  piServer.println();
+  piServer.print(data);
+  piServer.println();
+  
+  
+//  Serial.println("POST /arduino HTTP/1.1");
+//  Serial.println("Host: 192.168.1.131:3000");
+//  Serial.println("Content-Type: application/x-www-form-urlencoded");
+//  Serial.print("Content-Length: ");
+//  Serial.println(data.length());
+//  Serial.println();
+//  Serial.print(data);
+  
+  Serial.println("Done!");
+}
+
+void setupNetworkConnection()
+{
+   delay(1000);
+   // start the Ethernet connection:
+   if (Ethernet.begin(mac) == 0) {
+      Serial.println("Failed to configure Ethernet using DHCP");
+      // no point in carrying on, so do nothing forevermore:
+      // try to congifure using IP address instead of DHCP:
+      Ethernet.begin(mac, ip);
+   }
+   
+   if(piServer.connect(server, 3000))
+   {
+      Serial.println("Connected");
+   }
+   else{
+      piServer.stop();
+      Serial.println("Cannot connect to server!");
+   } 
+}
+
 void setup() {
- // Open serial communications and wait for port to open:
-  Serial.begin(9600);
-  Serial1.begin(9600);
-  Serial2.begin(9600);
-  Serial3.begin(9600);
+   // Open serial communications and wait for port to open:
+   Serial.begin(9600);
+   Serial1.begin(9600);
+   Serial2.begin(9600);
+   Serial3.begin(9600);
+   disconnectCount = 0;
 
-  // start the Ethernet connection:
-  if (!Ethernet.begin(mac)) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-    // no point in carrying on, so do nothing forevermore:
-    // try to congifure using IP address instead of DHCP:
-    Ethernet.begin(mac, ip);
-  }
-  // give the Ethernet shield a second to initialize:
-  delay(1000);
-  Serial.println("connecting...");
-
-  // if you get a connection, report back via serial:
-  if (piServer.connect(server, SERVER_PORT)) {
-    Serial.println("connected");
-//    piServer.print("Temperature: 20.9 °C\tHumidity: 60%\0");
-  } 
-  else {
-    // if you didn't get a connection to the server:
-    Serial.println("connection failed");
-  }
+   setupNetworkConnection();
 }
 
 void loop()
@@ -226,18 +244,24 @@ void loop()
       Serial.println();
       Serial.println("disconnecting.");
       piServer.stop();
-
-      // Output incoming temp and humidity data to the terminal forevermore:
-      while(true) {
-         if (Serial1.available()) {
-            ProcessUART1('t');      //read temp1 and humidity1 and send to terminal
-         }
-         if (Serial2.available()) {
-            ProcessUART2('t');      //read temp2 and humidity2 and send to terminal
-         }
-         if (Serial3.available()) {
-            ProcessUART3('t');      //read temp3 and humidity3 and send to terminal
+      
+      setupNetworkConnection();
+      
+      if (++disconnectCount > 9) {
+         // Output incoming temp and humidity data to the terminal forevermore:
+         while(true) {
+            if (Serial1.available()) {
+               ProcessUART1('t');      //read temp1 and humidity1 and send to terminal
+            }
+            if (Serial2.available()) {
+               ProcessUART2('t');      //read temp2 and humidity2 and send to terminal
+            }
+            if (Serial3.available()) {
+               ProcessUART3('t');      //read temp3 and humidity3 and send to terminal
+            }
          }
       }
    }
+   else
+      disconnectCount = 0;
 }
