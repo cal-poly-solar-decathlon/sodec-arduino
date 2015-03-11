@@ -1,4 +1,4 @@
-/* Name: Arduino TCP Client
+/* Name: Arduino HTTP Client
  * 
  * Description: Reads from up to 4 microcontrollers sending temp and humidity data (with checksum
  *              in an established format.
@@ -86,7 +86,7 @@ void ProcessUART1(char where) {
          }
       }
       else {            //checksum wrong, print error to terminal
-         Serial.println("BAD checksum");      
+         Serial.println("BAD checksum1");      
       }
    }
 }
@@ -117,7 +117,7 @@ void ProcessUART2(char where) {
          }
       }
       else {
-         Serial.println("BAD");
+         Serial.println("BAD Checksum2");
       }
    }
 }
@@ -148,7 +148,7 @@ void ProcessUART3(char where) {
          }
       }
       else {
-         Serial.println("BAD");
+         Serial.println("BAD Checksum3");
       }
    }
 }

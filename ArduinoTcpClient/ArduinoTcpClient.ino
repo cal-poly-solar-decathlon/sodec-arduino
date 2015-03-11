@@ -84,7 +84,7 @@ void ProcessUART1(char where) {
          }
       }
       else {            //checksum wrong, print error to terminal
-         Serial.println("BAD checksum");      
+         Serial.println("BAD checksum1");      
       }
    }
 }
@@ -120,7 +120,7 @@ void ProcessUART2(char where) {
          }
       }
       else {
-         Serial.println("BAD");
+         Serial.println("BAD Checksum2");
       }
    }
 }
@@ -156,7 +156,7 @@ void ProcessUART3(char where) {
          }
       }
       else {
-         Serial.println("BAD");
+         Serial.println("BAD Checksum3");
       }
    }
 }
