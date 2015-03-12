@@ -69,21 +69,21 @@ void ProcessUART1(char where) {
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {          //send ASCII data to server
             piServer.print("Temperature1: ");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
+            piServer.print((*(int16_t *)temperature) / 10.0, 1);
             piServer.print(" °C\tHumidity1: ");
             piServer.print((*(uint16_t *)humidity) / 10.0, 1);
             piServer.print("%\n\r");
          }
          else {                       //send ASCII data to terminal
             Serial.print("Temperature1: ");
-            Serial.print((*(uint16_t *)temperature) / 10.0, 1);
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
             Serial.print(" °C\tHumidity1: ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
          }
       }
       else {            //checksum wrong, print error to terminal
-         Serial.println("BAD Checksum");      
+         Serial.println("BAD Checksum1");      
       }
    }
 }
@@ -104,14 +104,14 @@ void ProcessUART2(char where) {
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
             piServer.print("Temperature2: ");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
+            piServer.print((*(int16_t *)temperature) / 10.0, 1);
             piServer.print(" °C\tHumidity2: ");
             piServer.print((*(uint16_t *)humidity) / 10.0, 1);
             piServer.print("%\n\r");
          }
          else {
             Serial.print("Temperature2: ");
-            Serial.print((*(uint16_t *)temperature) / 10.0, 1);
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
             Serial.print(" °C\tHumidity2: ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
@@ -139,14 +139,14 @@ void ProcessUART3(char where) {
       if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
             piServer.print("Temperature3: ");
-            piServer.print((*(uint16_t *)temperature) / 10.0, 1);
+            piServer.print((*(int16_t *)temperature) / 10.0, 1);
             piServer.print(" °C\tHumidity3: ");
             piServer.print((*(uint16_t *)humidity) / 10.0, 1);
             piServer.print("%\n\r");
          }
          else {
             Serial.print("Temperature3: ");
-            Serial.print((*(uint16_t *)temperature) / 10.0, 1);
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
             Serial.print(" °C\tHumidity3: ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
