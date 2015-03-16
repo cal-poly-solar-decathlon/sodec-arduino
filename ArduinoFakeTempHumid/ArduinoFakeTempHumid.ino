@@ -13,9 +13,9 @@
 #include <util/delay.h>
 
 #define BYTE_SIZE 8
-#define SEND_FREQ 1.5          //sends per second
-#define TEMP_INCREMENT 1.0     //degrees per second
-#define HUMID_INCREMENT 2.0    //percent increase per second
+//#define SEND_FREQ 0.2          //sends per second
+#define TEMP_INCREMENT 4.0     //degrees per second
+#define HUMID_INCREMENT 8.0    //percent increase per second
 
 #define TEMP_LOWER_LIMIT -50   //degrees C
 #define TEMP_LIMIT 200         //degrees C
@@ -37,14 +37,14 @@ unsigned int digit;
 int16_t temperature;
 uint16_t humidity;
 uint8_t checksum;
-int _global_delay;
+//int _global_delay;
 
 void setup () {
    DDRB = 0xFF;
 
    Serial.begin(9600);    //initialize USART communication
    temperature = humidity = checksum = 0;
-   _global_delay = 1000 / SEND_FREQ;
+//   _global_delay = 1000 / SEND_FREQ;
 }
 
 void loop () {
@@ -63,5 +63,5 @@ void loop () {
       temperature = TEMP_LOWER_LIMIT;
    humidity = (humidity + (uint16_t)(HUMID_INCREMENT * 10)) % (HUMID_LIMIT * 10);
 
-   _delay_ms(_global_delay);
+   _delay_ms(5000);
 }

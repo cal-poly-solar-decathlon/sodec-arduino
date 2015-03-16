@@ -26,7 +26,7 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x47, 0x26 };
 //IPAddress server(192,168,1,2);
 //IPAddress server(192,168,2,5);
 //IPAddress server(169,254,176,70);
-IPAddress server(192,168,2,2);  
+IPAddress server(192,168,2,3);
 //char server[] = "192.168.2.5";
 
 // Set the static IP address to use if the DHCP fails to assign
@@ -63,6 +63,7 @@ int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
  * sends to ('s')server or ('t')terminal connected by default to serial0
  */
 void ProcessUART1(char where) {
+   char *room = "s-temp-bed";
    Serial1.readBytes(&type, 1);        //read first 
    if (type == 'T') {                  //read temp data
       Serial1.readBytes(temperature, 2);
@@ -73,9 +74,11 @@ void ProcessUART1(char where) {
    else if (type == 'C') {             //read checksum byte
       Serial1.readBytes(&checksum, 1);
       //verify checksum
-      if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
+      if (checksumCheck(*(int16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {          //send ASCII data to server
-            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
+            postToServer(room, *(int16_t *)temperature);
+            room = "s-hum-bed";
+            postToServer(room, *(int16_t *)humidity);
          }
          else {                       //send ASCII data to terminal
             Serial.print("Temperature1: ");
@@ -95,6 +98,7 @@ void ProcessUART1(char where) {
  * read from UART2 (same as ProcessUART1)
  */
 void ProcessUART2(char where) {
+   char *room = "s-temp-bath";
    Serial2.readBytes(&type, 1);
    if (type == 'T') {
       Serial2.readBytes(temperature, 2);
@@ -104,13 +108,15 @@ void ProcessUART2(char where) {
    }
    else if (type == 'C') {
       Serial2.readBytes(&checksum, 1);
-      if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
+      if (checksumCheck(*(int16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
-            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
-         }
+            postToServer(room, *(int16_t *)temperature);
+            room = "s-hum-bath";
+            postToServer(room, *(int16_t *)humidity);
+          }
          else {
             Serial.print("Temperature2: ");
-            Serial.print((*(uint16_t *)temperature) / 10.0, 1);
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
             Serial.print(" °C\tHumidity2: ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
@@ -126,6 +132,7 @@ void ProcessUART2(char where) {
  * read from UART3 (same as ProcessUART1)
  */
 void ProcessUART3(char where) {
+   char *room = "s-temp-lr";
    Serial3.readBytes(&type, 1);
    if (type == 'T') {
       Serial3.readBytes(temperature, 2);
@@ -135,13 +142,15 @@ void ProcessUART3(char where) {
    }
    else if (type == 'C') {
       Serial3.readBytes(&checksum, 1);
-      if (checksumCheck(*(uint16_t *)temperature, *(uint16_t *)humidity, checksum)) {
+      if (checksumCheck(*(int16_t *)temperature, *(uint16_t *)humidity, checksum)) {
          if (where == 's') {
-            postToServer((*(uint16_t *)humidity) / 10.0, (*(uint16_t *)temperature) / 10.0);
-         }
+            postToServer(room, *(int16_t *)temperature);
+            room = "s-hum-lr";
+            postToServer(room, *(int16_t *)humidity);
+          }
          else {
             Serial.print("Temperature3: ");
-            Serial.print((*(uint16_t *)temperature) / 10.0, 1);
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
             Serial.print(" °C\tHumidity3: ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
@@ -153,46 +162,39 @@ void ProcessUART3(char where) {
    }
 }
 
-void postToServer(float humidity, float temperature)
+void postToServer(char *room, int16_t value)
 {
   
-  char tempStr[6], humStr[6];
-  char postString[30];
-  String data;
-    
-  dtostrf(temperature, 4, 2, tempStr);
-  dtostrf(humidity, 4, 2, humStr);
+//  char tempStr[6], humStr[6];
+   
+   char postString[30];
+   char device[30];
+   String data;
+   String postFirstString;
 
-  sprintf(postString, "humidity=%s&temperature=%s", humStr, tempStr);
-    
-  data = String(postString);
+   sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
+   data = String(postString);
+   sprintf(device, "POST /srv/record-reading?device=%s HTTP/1.1", room);
+   postFirstString = String(device);
 
-  // Make a HTTP request:
-  piServer.println("POST /arduino HTTP/1.1");
-  piServer.println("Host: 192.168.2.2:3000");
-  piServer.println("Content-Type: application/x-www-form-urlencoded");
-  piServer.print("Content-Length: ");
-  piServer.println(data.length());
-  piServer.println();
-  piServer.print(data);
-  piServer.println();
+   // Make a HTTP request:
+   piServer.println(postFirstString);
+   piServer.println("Host: 192.168.2.3:3000");
+   piServer.println("Content-Type: application/x-www-form-urlencoded");
+   piServer.print("Content-Length: ");
+   piServer.println(data.length());
+   piServer.println();
+   piServer.print(data);
+   piServer.println();
   
-  
-//  Serial.println("POST /arduino HTTP/1.1");
-//  Serial.println("Host: 192.168.1.131:3000");
-//  Serial.println("Content-Type: application/x-www-form-urlencoded");
-//  Serial.print("Content-Length: ");
-//  Serial.println(data.length());
-//  Serial.println();
-//  Serial.print(data);
-  
-  Serial.println("Done!");
+   Serial.println("Done!");
 }
 
 void setupNetworkConnection()
 {
    delay(1000);
    // start the Ethernet connection:
+   //GET RID OF DHCP AND USE STATIC IP
    if (Ethernet.begin(mac) == 0) {
       Serial.println("Failed to configure Ethernet using DHCP");
       // no point in carrying on, so do nothing forevermore:
@@ -247,21 +249,21 @@ void loop()
       
       setupNetworkConnection();
       
-      if (++disconnectCount > 9) {
-         // Output incoming temp and humidity data to the terminal forevermore:
-         while(true) {
-            if (Serial1.available()) {
-               ProcessUART1('t');      //read temp1 and humidity1 and send to terminal
-            }
-            if (Serial2.available()) {
-               ProcessUART2('t');      //read temp2 and humidity2 and send to terminal
-            }
-            if (Serial3.available()) {
-               ProcessUART3('t');      //read temp3 and humidity3 and send to terminal
-            }
-         }
-      }
+//      if (++disconnectCount > 9) {
+//         // Output incoming temp and humidity data to the terminal forevermore:
+//         while(true) {
+//            if (Serial1.available()) {
+//               ProcessUART1('t');      //read temp1 and humidity1 and send to terminal
+//            }
+//            if (Serial2.available()) {
+//               ProcessUART2('t');      //read temp2 and humidity2 and send to terminal
+//            }
+//            if (Serial3.available()) {
+//               ProcessUART3('t');      //read temp3 and humidity3 and send to terminal
+//            }
+//         }
+//      }
    }
-   else
-      disconnectCount = 0;
+//   else
+//      disconnectCount = 0;
 }
