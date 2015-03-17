@@ -13,9 +13,9 @@
 #include <util/delay.h>
 
 #define BYTE_SIZE 8
-//#define SEND_FREQ 0.2          //sends per second
-#define TEMP_INCREMENT 4.0     //degrees per second
-#define HUMID_INCREMENT 8.0    //percent increase per second
+#define SEND_DELAY 5000        //milliseconds between sends
+#define TEMP_INCREMENT 1.0     //degrees per second
+#define HUMID_INCREMENT 2.0    //percent increase per second
 
 #define TEMP_LOWER_LIMIT -50   //degrees C
 #define TEMP_LIMIT 200         //degrees C
@@ -60,8 +60,8 @@ void loop () {
    
    temperature += (uint16_t)(TEMP_INCREMENT * 10);
    if (temperature > TEMP_LIMIT * 10)
-      temperature = TEMP_LOWER_LIMIT;
+      temperature = TEMP_LOWER_LIMIT * 10;
    humidity = (humidity + (uint16_t)(HUMID_INCREMENT * 10)) % (HUMID_LIMIT * 10);
 
-   _delay_ms(5000);
+   _delay_ms(SEND_DELAY);
 }

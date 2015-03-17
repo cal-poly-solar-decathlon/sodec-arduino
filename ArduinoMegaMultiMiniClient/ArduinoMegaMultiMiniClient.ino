@@ -89,7 +89,7 @@ void ProcessUART1(char where) {
 }
 
 /* ProcessUART2
- * read from UART2 (same as ProcessUART1
+ * read from UART2 (same as ProcessUART1)
  */
 void ProcessUART2(char where) {
    Serial2.readBytes(&type, 1);
@@ -124,7 +124,7 @@ void ProcessUART2(char where) {
 }
 
 /* ProcessUART3
- * read from UART3 (same as ProcessUART1
+ * read from UART3 (same as ProcessUART1)
  */
 void ProcessUART3(char where) {
    Serial3.readBytes(&type, 1);
