@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include "TimerOne.h"
 
 //static port number outside the range of most reserved port numbers
 #define SERVER_PORT 54998
@@ -34,6 +35,27 @@ char type,
      checksum;
 char temperature[2],
      humidity[2];
+     
+char *uptime() // Function made to millis() be an optional parameter
+{
+  return (char *)uptime(millis()); // call original uptime function with unsigned long millis() value
+}
+
+char *uptime(unsigned long milli) {
+  static char _return[32];
+  unsigned long secs=milli/1000, mins=secs/60;
+  unsigned int hours=mins/60, days=hours/24;
+  milli-=secs*1000;
+  secs-=mins*60;
+  mins-=hours*60;
+  hours-=days*24;
+  sprintf(_return,"Uptime %d days %2.2d:%2.2d:%2.2d.%3.3d", (byte)days, (byte)hours, (byte)mins, (byte)secs, (int)milli);
+  return _return;
+}
+
+void timer1Event() {
+   Serial.println(uptime());
+}
 
 /* checksumCheck
  * return equality of received checksum value and calculated checksum
@@ -164,6 +186,9 @@ void setup() {
   Serial1.begin(9600);
   Serial2.begin(9600);
   Serial3.begin(9600);
+  
+  Timer1.initialize(50000000);
+  Timer1.attachInterrupt(timer1Event);
 
 //  // start the Ethernet connection:
 //  if (!Ethernet.begin(mac)) {
@@ -189,6 +214,7 @@ void setup() {
 
 void loop()
 {
+   
    if (Serial1.available()) {
       ProcessUART1('s');      //read temp1 and humidity1 and send to server
    }
