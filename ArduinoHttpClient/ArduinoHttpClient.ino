@@ -215,6 +215,10 @@ void postToServer(char *room, int16_t value)
    piServer.println();
   
    Serial.println("Done!");
+   while (piServer.available()) {
+     char c = piServer.read();
+     Serial.print(c);
+   }
 }
 
 void setupNetworkConnection()
@@ -265,10 +269,11 @@ void loop()
    }
    // if there are incoming bytes available from server,
    // read them and print them:
-   if (piServer.available()) {
+   while (piServer.available()) {
      char c = piServer.read();
      Serial.print(c);
    }
+   
 
    // if the server's disconnected, stop the piServer:
    if (!piServer.connected()) {
