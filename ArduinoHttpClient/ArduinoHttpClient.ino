@@ -217,9 +217,9 @@ void postToServer(char *room, int16_t value)
    Serial.print("Posted Data from Sensor: ");
    Serial.println(room);
 //   while (!piServer.available());
-   if (piServer.available())
+   if (piServer.connected() && piServer.available())
       Serial.println("HTTP Response");
-   while (piServer.available())
+   while (piServer.connected() && piServer.available())
      char c = piServer.read();
 }
 
@@ -271,9 +271,9 @@ void loop()
    }
    // if there are incoming bytes available from server,
    // read them and print them:
-   if (piServer.available())
+   if (piServer.connected() && piServer.available())
       Serial.println("HTTP Response");
-   while (piServer.available())
+   while (piServer.connected() && piServer.available())
      char c = piServer.read();
    
 
