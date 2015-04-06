@@ -177,5 +177,5 @@ void loop () {
 //   }  
 
    pulseCount = 0;
-   _delay_ms(5000);
+   _delay_ms(500);
 }

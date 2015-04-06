@@ -13,9 +13,9 @@
 #include <util/delay.h>
 
 #define BYTE_SIZE 8
-#define SEND_DELAY 5000        //milliseconds between sends
-#define TEMP_INCREMENT 1.0     //degrees per second
-#define HUMID_INCREMENT 2.0    //percent increase per second
+#define SEND_DELAY 500        //milliseconds between sends
+#define TEMP_INCREMENT 4.0     //degrees per second
+#define HUMID_INCREMENT 8.0    //percent increase per second
 
 #define TEMP_LOWER_LIMIT -50   //degrees C
 #define TEMP_LIMIT 200         //degrees C

@@ -174,7 +174,7 @@ void ProcessUART3(char where) {
             postToServer(room, *(int16_t *)temperature);
             room = "s-hum-lr";
             postToServer(room, *(int16_t *)humidity);
-          }
+         }
          else {
             Serial.print("Temperature3: ");
             Serial.print((*(int16_t *)temperature) / 10.0, 1);
@@ -214,11 +214,13 @@ void postToServer(char *room, int16_t value)
    piServer.print(data);
    piServer.println();
   
-   Serial.println("Done!");
-   while (piServer.available()) {
+   Serial.print("Posted Data from Sensor: ");
+   Serial.println(room);
+//   while (!piServer.available());
+   if (piServer.available())
+      Serial.println("HTTP Response");
+   while (piServer.available())
      char c = piServer.read();
-     Serial.print(c);
-   }
 }
 
 void setupNetworkConnection()
@@ -269,10 +271,10 @@ void loop()
    }
    // if there are incoming bytes available from server,
    // read them and print them:
-   while (piServer.available()) {
+   if (piServer.available())
+      Serial.println("HTTP Response");
+   while (piServer.available())
      char c = piServer.read();
-     Serial.print(c);
-   }
    
 
    // if the server's disconnected, stop the piServer:
