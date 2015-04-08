@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <SPI.h>
 #include <Ethernet.h>
+#include <avr/wdt.h>
 #include "TimerOne.h"
 
 //void postToServer(float humidity, float temperature, char *room);
@@ -108,9 +109,9 @@ void ProcessUART1(char where) {
             postToServer(room, *(int16_t *)humidity);
          }
          else {                       //send ASCII data to terminal
-            Serial.print("Temperature1: ");
+            Serial.print("Temperature1 (Bed): ");
             Serial.print((*(uint16_t *)temperature) / 10.0, 1);
-            Serial.print(" °C\tHumidity1: ");
+            Serial.print(" °C\tHumidity1 (Bed): ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
          }
@@ -142,9 +143,9 @@ void ProcessUART2(char where) {
             postToServer(room, *(int16_t *)humidity);
           }
          else {
-            Serial.print("Temperature2: ");
+            Serial.print("Temperature2 (Bath): ");
             Serial.print((*(int16_t *)temperature) / 10.0, 1);
-            Serial.print(" °C\tHumidity2: ");
+            Serial.print(" °C\tHumidity2 (Bath): ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
          }
@@ -176,9 +177,9 @@ void ProcessUART3(char where) {
             postToServer(room, *(int16_t *)humidity);
          }
          else {
-            Serial.print("Temperature3: ");
+            Serial.print("Temperature3 (LR): ");
             Serial.print((*(int16_t *)temperature) / 10.0, 1);
-            Serial.print(" °C\tHumidity3: ");
+            Serial.print(" °C\tHumidity3 (LR): ");
             Serial.print((*(uint16_t *)humidity) / 10.0, 1);
             Serial.print("%\n\r");
          }
@@ -189,10 +190,43 @@ void ProcessUART3(char where) {
    }
 }
 
+/* ProcessUART0
+ * read from UART0 (same as ProcessUART1)
+ */
+void ProcessUART0(char where) {
+   char *room = "s-temp-out";
+   Serial.readBytes(&type, 1);
+   if (type == 'T') {
+      Serial.readBytes(temperature, 2);
+   }
+   else if (type == 'H') {
+      Serial.readBytes(humidity, 2);
+   }
+   else if (type == 'C') {
+      Serial.readBytes(&checksum, 1);
+      if (checksumCheck(*(int16_t *)temperature, *(uint16_t *)humidity, checksum)) {
+         if (where == 's') {
+            postToServer(room, *(int16_t *)temperature);
+            room = "s-hum-out";
+            postToServer(room, *(int16_t *)humidity);
+         }
+         else {
+            Serial.print("Temperature0 (Out): ");
+            Serial.print((*(int16_t *)temperature) / 10.0, 1);
+            Serial.print(" °C\tHumidity0 (Out): ");
+            Serial.print((*(uint16_t *)humidity) / 10.0, 1);
+            Serial.print("%\n\r");
+         }
+      }
+      else if (where != 's'){
+         Serial.println("BAD Checksum3");
+      }
+   }
+}
+
 void postToServer(char *room, int16_t value)
 {
-  
-//  char tempStr[6], humStr[6];
+   char readC;
    
    char postString[30];
    char device[30];
@@ -216,16 +250,17 @@ void postToServer(char *room, int16_t value)
   
    Serial.print("Posted Data from Sensor: ");
    Serial.println(room);
-//   while (!piServer.available());
-   if (piServer.connected() && piServer.available())
+
+   if (piServer.connected() && piServer.available()) {
       Serial.println("HTTP Response");
-   while (piServer.connected() && piServer.available())
-     char c = piServer.read();
+      while (piServer.connected() && piServer.available())
+         readC = piServer.read();
+   }
 }
 
 void setupNetworkConnection()
 {
-   delay(1000);
+//   delay(1000);
    // start the Ethernet connection:
    //GET RID OF DHCP AND USE STATIC IP
    if (Ethernet.begin(mac) == 0) {
@@ -253,28 +288,41 @@ void setup() {
    Serial3.begin(9600);
    Timer1.initialize(5000000);
    Timer1.attachInterrupt(timer1Event);
+   wdt_enable(WDTO_8S);
   
-
+   delay(1000);
    setupNetworkConnection();
 }
 
 void loop()
 {
+   char readC;
+   
+//   if (Serial.available()) {
+//      ProcessUART('s');      //read temp3 and humidity3 and send to server
+//      wdt_reset();
+//   }
+   
    if (Serial1.available()) {
       ProcessUART1('s');      //read temp1 and humidity1 and send to server
+      wdt_reset();
    }
    if (Serial2.available()) {
       ProcessUART2('s');      //read temp2 and humidity2 and send to server
+      wdt_reset();
    }
    if (Serial3.available()) {
       ProcessUART3('s');      //read temp3 and humidity3 and send to server
+      wdt_reset();
    }
+   
    // if there are incoming bytes available from server,
    // read them and print them:
-   if (piServer.connected() && piServer.available())
+   if (piServer.connected() && piServer.available()) {
       Serial.println("HTTP Response");
-   while (piServer.connected() && piServer.available())
-     char c = piServer.read();
+      while (piServer.connected() && piServer.available())
+         readC = piServer.read();
+   }
    
 
    // if the server's disconnected, stop the piServer:
