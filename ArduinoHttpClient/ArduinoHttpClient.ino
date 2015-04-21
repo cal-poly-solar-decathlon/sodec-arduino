@@ -102,6 +102,8 @@ int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
  */
 void ProcessUART1(char where) {
    char *room = "s-temp-bed";
+   
+   Serial.print("U1");
    Serial1.readBytes(&type1, 1);        //read first 
    if (type1 == 'T') {                  //read temp data
       Serial1.readBytes(temperature1, 2);
@@ -130,6 +132,7 @@ void ProcessUART1(char where) {
          Serial.println("BAD checksum1");      
       }
    }
+   Serial.print("/U1\t");
 }
 
 /* ProcessUART2
@@ -137,6 +140,8 @@ void ProcessUART1(char where) {
  */
 void ProcessUART2(char where) {
    char *room = "s-temp-bath";
+   
+   Serial.print("U2");
    Serial2.readBytes(&type2, 1);
    if (type2 == 'T') {
       Serial2.readBytes(temperature2, 2);
@@ -164,6 +169,7 @@ void ProcessUART2(char where) {
          Serial.println("BAD Checksum2");
       }
    }
+   Serial.print("/U2\t");
 }
 
 /* ProcessUART3
@@ -171,6 +177,8 @@ void ProcessUART2(char where) {
  */
 void ProcessUART3(char where) {
    char *room = "s-temp-lr";
+   
+   Serial.print("U3");
    Serial3.readBytes(&type3, 1);
    if (type3 == 'T') {
       Serial3.readBytes(temperature3, 2);
@@ -198,6 +206,7 @@ void ProcessUART3(char where) {
          Serial.println("BAD Checksum3");
       }
    }
+   Serial.print("/U3\t");
 }
 
 /* ProcessUART0
@@ -205,6 +214,8 @@ void ProcessUART3(char where) {
  */
 void ProcessUART0(char where) {
    char *room = "s-temp-out";
+   
+   Serial.print("U0");
    Serial.readBytes(&type0, 1);
    if (type0 == 'T') {
       Serial.readBytes(temperature0, 2);
@@ -232,16 +243,17 @@ void ProcessUART0(char where) {
          Serial.println("BAD Checksum0");
       }
    }
+   Serial.print("/U0\t");
 }
 
 void postToServer(char *room, int16_t value) {
    char readC;
-   
    char postString[30];
    char device[30];
    String data;
    String postFirstString;
 
+   Serial.print("#post");
    sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
    data = String(postString);
    sprintf(device, "POST /srv/record-reading?device=%s HTTP/1.1", room);
@@ -276,6 +288,7 @@ void postToServer(char *room, int16_t value) {
 
 void setupNetworkConnection()
 {
+   Serial.print("#setup");
 //   delay(1000);
    // start the Ethernet connection:
    //GET RID OF DHCP AND USE STATIC IP
@@ -293,7 +306,9 @@ void setupNetworkConnection()
    else{
       piServer.stop();
       Serial.println("Cannot connect to server!");
-   } 
+   }
+   
+   Serial.print("#/setup\t");
 }
 
 void setup() {
@@ -328,17 +343,17 @@ void loop()
    
    if (Serial1.available()) {
       ProcessUART1('s');      //read temp1 and humidity1 and send to server
-      Serial.print("UART1\t");
+//      Serial.print("UART1\t");
       wdt_reset();
    }
    if (Serial2.available()) {
       ProcessUART2('s');      //read temp2 and humidity2 and send to server
-      Serial.print("UART2\t");
+//      Serial.print("UART2\t");
       wdt_reset();
    }
    if (Serial3.available()) {
       ProcessUART3('s');      //read temp3 and humidity3 and send to server
-      Serial.print("UART3\t");
+//      Serial.print("UART3\t");
       wdt_reset();
    }
    
