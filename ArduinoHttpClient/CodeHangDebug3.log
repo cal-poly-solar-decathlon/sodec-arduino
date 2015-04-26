@@ -1,0 +1,168 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2015.04.26 13:32:03 =~=~=~=~=~=~=~=~=~=~=~=
+----------------------------------RESET------------------------------------
+---------------------------------------------------------------------------
+#setupConnected
+#/setupU1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1#postPosted: s-temp-bed157.00HTTP Response
+#postPosted: s-hum-bed68.00HTTP Response
+/U1U2#postPosted: s-temp-bath34.00HTTP Response
+#postPosted: s-hum-bath12.00HTTP Response
+/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1#postPosted: s-temp-bed158.00HTTP Response
+#postPosted: s-hum-bed70.00HTTP Response
+/U1U2#postPosted: s-temp-bath38.00HTTP Response
+#postPosted: s-hum-bath20.00HTTP Response
+/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1#postPosted: s-temp-bed159.00HTTP Response
+#postPosted: s-hum-bed72.00HTTP Response
+/U1U2#postPosted: s-temp-bath42.00HTTP Response
+#postPosted: s-hum-bath28.00HTTP Response
+/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1#postPosted: s-temp-bed160.00HTTP Response
+#postPosted: s-hum-bed74.00HTTP Response
+/U1U2#postPosted: s-temp-bath46.00HTTP Response
+#postPosted: s-hum-bath36.00HTTP Response
+/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1#postPosted: s-temp-bed161.00HTTP Response
+#postPosted: s-hum-bed76.00HTTP Response
+/U1U2#postPosted: s-temp-bath50.00HTTP Response
+#postPosted: s-hum-bath44.00HTTP Response
+/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3/U3U1/U1U2/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed170.00HTTP Response
+#postPosted: s-hum-bed94.00HTTP Response
+/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed171.00HTTP Response
+#postPosted: s-hum-bed96.00HTTP Response
+/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed172.00HTTP Response
+#postPosted: s-hum-bed98.00HTTP Response
+/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed173.00HTTP Response
+#postPosted: s-hum-bed0.00HTTP Response
+/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed174.00HTTP Response
+#postPosted: s-hum-bed2.00HTTP Response
+/U1U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed175.00#postPosted: s-hum-bed4.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath106.00HTTP Response
+#postPosted: s-hum-bath56.00HTTP Response
+/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U1/U1U1#postPosted: s-temp-bed176.00HTTP Response
+#postPosted: s-hum-bed6.00HTTP Response
+/U1U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10/U3U1/U1HTTP Response
+U1/U1U2/U2U2/U2U2#postPosted: s-temp-bath118.00HTTP Response
+#postPosted: s-hum-bath80.00HTTP Response
+/U2U3/U3U1/U1U3/U3U1/U1U3#postPosted: s-temp-lr23.00#postPosted: s-hum-lr34.10HTTP Response
+/U3U1#postPosted: s-temp-bed179.00HTTP Response
+#postPosted: s-hum-bed12.00HTTP Response
+/U1U2/U2U1/U1U1/U1U3/U3U1#postPosted: s-temp-bed180.00#postPosted: s-hum-bed14.00HTTP Response
+/U1U3/U3U2/U2U2/U2U2#postPosted: s-temp-bath126.00HTTP Response
+#postPosted: s-hum-bath96.00HTTP Response
+/U2U1/U1U1/U1U1#postPosted: s-temp-bed181.00HTTP Response
+#postPosted: s-hum-bed16.00HTTP Response
+/U1U2/U2U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U1/U1U3/U3U2/U2U2/U2U2#postPosted: s-temp-bath134.00#postPosted: s-hum-bath12.00/U2HTTP Response
+HTTP Response
+U1/U1U1/U1U1#postPosted: s-temp-bed183.00#postPosted: s-hum-bed20.00/U1U3/U3HTTP Response
+U3/U3U3BAD Checksum3
+/U3U2/U2U2/U2U2#postPosted: s-temp-bath138.00HTTP Response
+#postPosted: s-hum-bath20.00HTTP Response
+/U2U1/U1U1/U1U1#postPosted: s-temp-bed184.00#postPosted: s-hum-bed22.00HTTP Response
+/U1U2/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed185.00#postPosted: s-hum-bed24.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed186.00#postPosted: s-hum-bed26.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath150.00HTTP Response
+#postPosted: s-hum-bath44.00HTTP Response
+/U2U1/U1U1/U1U1#postPosted: s-temp-bed187.00#postPosted: s-hum-bed28.00HTTP Response
+/U1U3/U3U2/U2U2/U2U2#postPosted: s-temp-bath154.00HTTP Response
+#postPosted: s-hum-bath52.00HTTP Response
+/U2U1/U1U1/U1U1#postPosted: s-temp-bed188.00HTTP Response
+#postPosted: s-hum-bed30.00HTTP Response
+/U1U2/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed189.00#postPosted: s-hum-bed32.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed190.00#postPosted: s-hum-bed34.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed191.00#postPosted: s-hum-bed36.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed192.00#postPosted: s-hum-bed38.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed193.00#postPosted: s-hum-bed40.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed194.00#postPosted: s-hum-bed42.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed195.00#postPosted: s-hum-bed44.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed196.00#postPosted: s-hum-bed46.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:08.521+++++++++++++++++++++++++
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed197.00HTTP Response
+#postPosted: s-hum-bed48.00HTTP Response
+/U1U2/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed198.00#postPosted: s-hum-bed50.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed199.00#postPosted: s-hum-bed52.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed200.00#postPosted: s-hum-bed54.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-50.00#postPosted: s-hum-bed56.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-49.00#postPosted: s-hum-bed58.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-48.00#postPosted: s-hum-bed60.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-47.00#postPosted: s-hum-bed62.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-46.00#postPosted: s-hum-bed64.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-45.00#postPosted: s-hum-bed66.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-44.00#postPosted: s-hum-bed68.00/U1HTTP Response
+U3/U3U3/U3U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-43.00#postPosted: s-hum-bed70.00/U1HTTP Response
+U3/U3U2/U2U3/U3U2/U2U3#postPosted: s-temp-lr23.00HTTP Response
+#postPosted: s-hum-lr34.10HTTP Response
+/U3U2#postPosted: s-temp-bath-14.00HTTP Response
+#postPosted: s-hum-bath20.00HTTP Response
+/U2U3/U3U1/U1U2/U2U1/U1U1/U1U1#postPosted: s-temp-bed-41.00#postPosted: s-hum-bed74.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath-6.00HTTP Response
+#postPosted: s-hum-bath36.00HTTP Response
+/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed-40.00#postPosted: s-hum-bed76.00HTTP Response
+/U1U2/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed-39.00#postPosted: s-hum-bed78.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath2.00HTTP Response
+#postPosted: s-hum-bath52.00HTTP Response
+/U2U1/U1U1/U1U1#postPosted: s-temp-bed-38.00#postPosted: s-hum-bed80.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath6.00HTTP Response
+#postPosted: s-hum-bath60.00HTTP Response
+/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed-37.00#postPosted: s-hum-bed82.00HTTP Response
+/U1U2/U2U2/U2U2#postPosted: s-temp-bath10.00HTTP Response
+#postPosted: s-hum-bath68.00HTTP Response
+/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed-36.00#postPosted: s-hum-bed84.00HTTP Response
+/U1U2/U2U3/U3U1/U1U1/U1U1#postPosted: s-temp-bed-35.00#postPosted: s-hum-bed86.00/U1HTTP Response
+U2/U2U2/U2U2#postPosted: s-temp-bath18.00HTTP Response
+#postPosted: s-hum-bath84.00HTTP Response
+/U2U3/U3U1/U1U1/U1

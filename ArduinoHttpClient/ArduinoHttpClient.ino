@@ -254,6 +254,7 @@ void postToServer(char *room, int16_t value) {
    String postFirstString;
 
    Serial.print("#post");
+   noInterrupts();
    sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
    data = String(postString);
    sprintf(device, "POST /srv/record-reading?device=%s HTTP/1.1", room);
@@ -284,6 +285,7 @@ void postToServer(char *room, int16_t value) {
       while (piServer.connected() && piServer.available())
          readC = piServer.read();
    }
+   interrupts();
 }
 
 void setupNetworkConnection()
