@@ -14,12 +14,13 @@
 #include <avr/wdt.h>
 #include "TimerOne.h"
 
+#define UPTIME_LOG_INCREMENT 100000
+//static port number outside the range of most reserved port numbers
+#define SERVER_PORT 3000
+
 //void postToServer(float humidity, float temperature, char *room);
 void postToServer(char *room, int16_t value);
 void setupNetworkConnection();
-
-//static port number outside the range of most reserved port numbers
-#define SERVER_PORT 3000
 
 // MAC address for Ethernet Shield.
 byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x47, 0x26 };
@@ -38,11 +39,13 @@ IPAddress ip(192,168,2,4);
 // with the IP address and port of the server
 EthernetClient piServer;
 
+uint32_t uptimeLoopCount;
 char type0,
      type1,
      type2,
      type3,
-     checksum;
+     checksum,
+     readC;
 char temperature0[2],
      temperature1[2],
      temperature2[2],
@@ -69,16 +72,16 @@ char *uptime(unsigned long milli) {
   return _return;
 }
 
-void timer1Event() {
-   static int count = 1;
-   
-   if (count++ >= 4) {
-      Serial.print("+++++++++++++++++++++++++");
-      Serial.print(uptime());
-      Serial.println("+++++++++++++++++++++++++");
-      count = 1;
-   }
-}
+//void timer1Event() {
+//   static int count = 1;
+//   
+//   if (count++ >= 4) {
+//      Serial.print("+++++++++++++++++++++++++");
+//      Serial.print(uptime());
+//      Serial.println("+++++++++++++++++++++++++");
+//      count = 1;
+//   }
+//}
 
 /* checksumCheck
  * return equality of received checksum value and calculated checksum
@@ -103,15 +106,19 @@ int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
 void ProcessUART1(char where) {
    char *room = "s-temp-bed";
    
+   Serial1.setTimeout(500);
    Serial.print("U1");
    Serial1.readBytes(&type1, 1);        //read first 
    if (type1 == 'T') {                  //read temp data
+      Serial1.setTimeout(500);
       Serial1.readBytes(temperature1, 2);
    }
    else if (type1 == 'H') {             //read humidity data
+      Serial1.setTimeout(500);
       Serial1.readBytes(humidity1, 2);
    }
    else if (type1 == 'C') {             //read checksum byte
+      Serial1.setTimeout(500);
       Serial1.readBytes(&checksum, 1);
       //verify checksum
       if (checksumCheck(*(int16_t *)temperature1, *(uint16_t *)humidity1, checksum)) {
@@ -141,15 +148,19 @@ void ProcessUART1(char where) {
 void ProcessUART2(char where) {
    char *room = "s-temp-bath";
    
+   Serial2.setTimeout(500);
    Serial.print("U2");
    Serial2.readBytes(&type2, 1);
    if (type2 == 'T') {
+      Serial2.setTimeout(500);
       Serial2.readBytes(temperature2, 2);
    }
    else if (type2 == 'H') {
+      Serial2.setTimeout(500);
       Serial2.readBytes(humidity2, 2);
    }
    else if (type2 == 'C') {
+      Serial2.setTimeout(500);
       Serial2.readBytes(&checksum, 1);
       if (checksumCheck(*(int16_t *)temperature2, *(uint16_t *)humidity2, checksum)) {
          if (where == 's') {
@@ -178,15 +189,19 @@ void ProcessUART2(char where) {
 void ProcessUART3(char where) {
    char *room = "s-temp-lr";
    
+   Serial3.setTimeout(500);
    Serial.print("U3");
    Serial3.readBytes(&type3, 1);
    if (type3 == 'T') {
+      Serial3.setTimeout(500);
       Serial3.readBytes(temperature3, 2);
    }
    else if (type3 == 'H') {
+      Serial3.setTimeout(500);
       Serial3.readBytes(humidity3, 2);
    }
    else if (type3 == 'C') {
+      Serial3.setTimeout(500);
       Serial3.readBytes(&checksum, 1);
       if (checksumCheck(*(int16_t *)temperature3, *(uint16_t *)humidity3, checksum)) {
          if (where == 's') {
@@ -216,14 +231,18 @@ void ProcessUART0(char where) {
    char *room = "s-temp-out";
    
    Serial.print("U0");
+   Serial.setTimeout(500);
    Serial.readBytes(&type0, 1);
    if (type0 == 'T') {
+      Serial.setTimeout(500);
       Serial.readBytes(temperature0, 2);
    }
    else if (type0 == 'H') {
+      Serial.setTimeout(500);
       Serial.readBytes(humidity0, 2);
    }
    else if (type0 == 'C') {
+      Serial.setTimeout(500);
       Serial.readBytes(&checksum, 1);
       if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
          if (where == 's') {
@@ -247,14 +266,13 @@ void ProcessUART0(char where) {
 }
 
 void postToServer(char *room, int16_t value) {
-   char readC;
    char postString[30];
    char device[30];
    String data;
    String postFirstString;
 
    Serial.print("#post");
-   noInterrupts();
+//   noInterrupts();
    sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
    data = String(postString);
    sprintf(device, "POST /srv/record-reading?device=%s HTTP/1.1", room);
@@ -285,7 +303,7 @@ void postToServer(char *room, int16_t value) {
       while (piServer.connected() && piServer.available())
          readC = piServer.read();
    }
-   interrupts();
+//   interrupts();
 }
 
 void setupNetworkConnection()
@@ -324,8 +342,10 @@ void setup() {
    Serial2.setTimeout(500);
    Serial3.setTimeout(500);
    
-   Timer1.initialize(5000000);
-   Timer1.attachInterrupt(timer1Event);
+   uptimeLoopCount = 0;
+   
+//   Timer1.initialize(5000000);
+//   Timer1.attachInterrupt(timer1Event);
    wdt_enable(WDTO_8S);
   
    delay(1000);
@@ -335,13 +355,19 @@ void setup() {
 }
 
 void loop()
-{
-   char readC;
-   
+{   
 //   if (Serial.available()) {
 //      ProcessUART('s');      //read temp3 and humidity3 and send to server
 //      wdt_reset();
 //   }
+   
+   if (uptimeLoopCount++ > UPTIME_LOG_INCREMENT) {
+      Serial.print("+++++++++++++++++++++++++");
+      Serial.print(uptime());
+      Serial.println("+++++++++++++++++++++++++");
+      uptimeLoopCount = 0;
+   }
+      
    
    if (Serial1.available()) {
       ProcessUART1('s');      //read temp1 and humidity1 and send to server
