@@ -13,6 +13,7 @@
 #include <Ethernet.h>
 #include <avr/wdt.h>
 #include "TimerOne.h"
+#include <SD.h>
 
 #define UPTIME_LOG_INCREMENT 100000
 //static port number outside the range of most reserved port numbers
@@ -40,6 +41,7 @@ IPAddress ip(192,168,2,4);
 EthernetClient piServer;
 
 uint32_t uptimeLoopCount;
+bool sdCardReady = false;
 char type0,
      type1,
      type2,
@@ -365,6 +367,30 @@ void loop()
       Serial.print("+++++++++++++++++++++++++");
       Serial.print(uptime());
       Serial.println("+++++++++++++++++++++++++");
+      //if pin A0 is high, we have theoretically inserted an SD card
+      if (PINA & (1<<PA0)) {
+        // if we have already initialized the card
+        if (sdCardReady) {
+         File dataFile = SD.open("datalog.txt", FILE_WRITE);
+          // if the file is available, write to it:
+          if (dataFile) {
+            dataFile.println(uptime());
+            dataFile.close();
+          }
+          // if the file isn't open, pop up an error:
+          else {
+            Serial.println("error opening datalog.txt");
+          }
+        } else { //initialize the card
+          if (!SD.begin()) {
+            Serial.println("Card failed, or not present");
+          } else {
+            sdCardReady = true;
+          }
+        }
+     } else { //we have theoretically removed the card
+       sdCardReady = false;
+     }
       uptimeLoopCount = 0;
    }
       
