@@ -15,9 +15,11 @@
 #include "TimerOne.h"
 #include <SD.h>
 
-#define UPTIME_LOG_INCREMENT 100000
+#define TIMER1_PERIOD 1000000
 //static port number outside the range of most reserved port numbers
 #define SERVER_PORT 3000
+
+static const uint32_t UPTIME_LOG_INCREMENT = 15;   //seconds
 
 //void postToServer(float humidity, float temperature, char *room);
 void postToServer(char *room, int16_t value);
@@ -30,11 +32,11 @@ byte mac[] = { 0x90, 0xA2, 0xDA, 0x0F, 0x47, 0x26 };
 //IPAddress server(192,168,1,2);
 //IPAddress server(192,168,2,5);
 //IPAddress server(169,254,176,70);
-IPAddress server(192,168,2,3);
+IPAddress server(192,168,1,3);
 //char server[] = "192.168.2.5";
 
 // Set the static IP address to use if the DHCP fails to assign
-IPAddress ip(192,168,2,4);
+IPAddress ip(192,168,1,4);
 
 // Initialize the Ethernet client library
 // with the IP address and port of the server
@@ -109,7 +111,7 @@ void ProcessUART1(char where) {
    char *room = "s-temp-bed";
    
    Serial1.setTimeout(500);
-   Serial.print("U1");
+//   Serial.print("U1");
    Serial1.readBytes(&type1, 1);        //read first 
    if (type1 == 'T') {                  //read temp data
       Serial1.setTimeout(500);
@@ -141,7 +143,7 @@ void ProcessUART1(char where) {
          Serial.println("BAD checksum1");      
       }
    }
-   Serial.print("/U1\t");
+//   Serial.print("/U1\t");
 }
 
 /* ProcessUART2
@@ -151,7 +153,7 @@ void ProcessUART2(char where) {
    char *room = "s-temp-bath";
    
    Serial2.setTimeout(500);
-   Serial.print("U2");
+//   Serial.print("U2");
    Serial2.readBytes(&type2, 1);
    if (type2 == 'T') {
       Serial2.setTimeout(500);
@@ -182,7 +184,7 @@ void ProcessUART2(char where) {
          Serial.println("BAD Checksum2");
       }
    }
-   Serial.print("/U2\t");
+//   Serial.print("/U2\t");
 }
 
 /* ProcessUART3
@@ -192,7 +194,7 @@ void ProcessUART3(char where) {
    char *room = "s-temp-lr";
    
    Serial3.setTimeout(500);
-   Serial.print("U3");
+//   Serial.print("U3");
    Serial3.readBytes(&type3, 1);
    if (type3 == 'T') {
       Serial3.setTimeout(500);
@@ -223,7 +225,7 @@ void ProcessUART3(char where) {
          Serial.println("BAD Checksum3");
       }
    }
-   Serial.print("/U3\t");
+//   Serial.print("/U3\t");
 }
 
 /* ProcessUART0
@@ -232,48 +234,58 @@ void ProcessUART3(char where) {
 void ProcessUART0(char where) {
    char *room = "s-temp-out";
    
-   Serial.print("U0");
    Serial.setTimeout(500);
    Serial.readBytes(&type0, 1);
    if (type0 == 'T') {
       Serial.setTimeout(500);
-      Serial.readBytes(temperature0, 2);
+      Serial.readBytes(&type0, 1);
+      if (type0 == 'O') {
+         Serial.setTimeout(500);
+         Serial.readBytes(temperature0, 2);
+      }
    }
    else if (type0 == 'H') {
       Serial.setTimeout(500);
-      Serial.readBytes(humidity0, 2);
+      Serial.readBytes(&type0, 1);
+      if (type0 == 'O') {
+         Serial.setTimeout(500);
+         Serial.readBytes(humidity0, 2);
+      }
    }
    else if (type0 == 'C') {
       Serial.setTimeout(500);
-      Serial.readBytes(&checksum, 1);
-      if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
-         if (where == 's') {
-            postToServer(room, *(int16_t *)temperature0);
-            room = "s-hum-out";
-            postToServer(room, *(int16_t *)humidity0);
+      Serial.readBytes(&type0, 1);
+      if (type0 == 'O') {
+         Serial.setTimeout(500);
+         Serial.readBytes(&checksum, 1);
+         if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
+            if (where == 's') {
+               postToServer(room, *(int16_t *)temperature0);
+               room = "s-hum-out";
+               postToServer(room, *(int16_t *)humidity0);
+            }
+            else {
+               Serial.print("Temperature0 (Out): ");
+               Serial.print((*(int16_t *)temperature0) / 10.0, 1);
+               Serial.print(" °C\tHumidity0 (Out): ");
+               Serial.print((*(uint16_t *)humidity0) / 10.0, 1);
+               Serial.print("%\n\r");
+            }
          }
-         else {
-            Serial.print("Temperature0 (Out): ");
-            Serial.print((*(int16_t *)temperature0) / 10.0, 1);
-            Serial.print(" °C\tHumidity0 (Out): ");
-            Serial.print((*(uint16_t *)humidity0) / 10.0, 1);
-            Serial.print("%\n\r");
+         else if (where != 's'){
+            Serial.println("BAD Checksum0");
          }
-      }
-      else if (where != 's'){
-         Serial.println("BAD Checksum0");
       }
    }
-   Serial.print("/U0\t");
 }
 
 void postToServer(char *room, int16_t value) {
-   char postString[30];
-   char device[30];
+   char postString[100] = {0};
+   char device[100] = {0};
    String data;
    String postFirstString;
 
-   Serial.print("#post");
+   Serial.print("#post ");
 //   noInterrupts();
    sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
    data = String(postString);
@@ -282,26 +294,35 @@ void postToServer(char *room, int16_t value) {
 
    if (piServer.connected()) {
      // Make a HTTP request:
+     wdt_reset();
+     Serial.print(room);
      piServer.println(postFirstString);
-     piServer.println("Host: 192.168.2.3:3000");
+     Serial.print("\t1");
+     piServer.println("Host: 192.168.2.5:3000");
+     Serial.print("2");
      piServer.println("Content-Type: application/x-www-form-urlencoded");
+     Serial.print("3");
      piServer.print("Content-Length: ");
+     Serial.print("4");
      piServer.println(data.length());
+     Serial.print("5");
      piServer.println();
+     Serial.print("6");
      piServer.print(data);
+     Serial.print("7");
      piServer.println();
-    
+     
      Serial.print("Posted: ");
      Serial.print(room);
      Serial.print("\t");
-     Serial.print(value / 10.0);
-     Serial.print("\t");
+     Serial.println(value / 10.0);
+//     Serial.print("\t");
    }
    else
       Serial.println("Failed to Post");
 
    if (piServer.connected() && piServer.available()) {
-      Serial.println("HTTP Response");
+      Serial.println("--RESP--");
       while (piServer.connected() && piServer.available())
          readC = piServer.read();
    }
@@ -330,7 +351,7 @@ void setupNetworkConnection()
       Serial.println("Cannot connect to server!");
    }
    
-   Serial.print("#/setup\t");
+//   Serial.print("#/setup\t");
 }
 
 void setup() {
@@ -346,13 +367,13 @@ void setup() {
    
    uptimeLoopCount = 0;
    
-//   Timer1.initialize(5000000);
+   Timer1.initialize(8000000);
+   Timer1.start();
 //   Timer1.attachInterrupt(timer1Event);
    wdt_enable(WDTO_8S);
   
    delay(1000);
    Serial.println("----------------------------------RESET------------------------------------");
-   Serial.println("---------------------------------------------------------------------------");
    setupNetworkConnection();
 }
 
@@ -362,36 +383,43 @@ void loop()
 //      ProcessUART('s');      //read temp3 and humidity3 and send to server
 //      wdt_reset();
 //   }
-   
-   if (uptimeLoopCount++ > UPTIME_LOG_INCREMENT) {
+
+   if (Timer1.read() > TIMER1_PERIOD) {
+      uptimeLoopCount++;
+      Timer1.restart();
+   }
+      
+   if (uptimeLoopCount > UPTIME_LOG_INCREMENT) {
       Serial.print("+++++++++++++++++++++++++");
       Serial.print(uptime());
       Serial.println("+++++++++++++++++++++++++");
       //if pin A0 is high, we have theoretically inserted an SD card
-      if (PINA & (1<<PA0)) {
-        // if we have already initialized the card
-        if (sdCardReady) {
-         File dataFile = SD.open("datalog.txt", FILE_WRITE);
-          // if the file is available, write to it:
-          if (dataFile) {
-            dataFile.println(uptime());
-            dataFile.close();
-          }
-          // if the file isn't open, pop up an error:
-          else {
-            Serial.println("error opening datalog.txt");
-          }
-        } else { //initialize the card
-          if (!SD.begin()) {
-            Serial.println("Card failed, or not present");
-          } else {
-            sdCardReady = true;
-          }
-        }
-     } else { //we have theoretically removed the card
-       sdCardReady = false;
-     }
-      uptimeLoopCount = 0;
+//      if (PINA & (1<<PA0)) {
+//         // if we have already initialized the card
+//         if (sdCardReady) {
+//            File dataFile = SD.open("/Uptime.log", FILE_WRITE);
+//            // if the file is available, write to it:
+//            if (dataFile) {
+//               dataFile.println(uptime());
+//               dataFile.close();
+//               Serial.println("---Logged to SD card---");
+//            }
+//            // if the file isn't open, pop up an error:
+//            else {
+//               Serial.println("error opening Uptime.log");
+//            }
+//         } else { //initialize the card
+//            if (!SD.begin(4)) {
+//               Serial.println("Card failed, or not present");
+//            } else {
+//               sdCardReady = true;
+//            }
+//         }
+//      } else { //we have theoretically removed the card
+//         sdCardReady = false;
+//         Serial.println("No Card");
+//      }
+         uptimeLoopCount = 0;
    }
       
    

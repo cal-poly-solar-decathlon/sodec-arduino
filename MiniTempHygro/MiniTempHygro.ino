@@ -102,6 +102,8 @@ uint8_t outOfRange = 0;
 
 void setup () {
    DDRB = 0xFF;
+   pinMode(13, OUTPUT);
+   digitalWrite(13,HIGH);
    digitalWrite(RHT03_DATA,HIGH);
    //   DDRD = 0xFF;
    
@@ -117,7 +119,7 @@ void setup () {
 
 void loop () {
    int i;
-   
+          
    pinMode(RHT03_DATA, OUTPUT);
    RHT03_Read
    pinMode(RHT03_DATA, INPUT);
