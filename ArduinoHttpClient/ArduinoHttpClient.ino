@@ -59,6 +59,7 @@ char temperature0[2],
      humidity1[2],
      humidity2[2],
      humidity3[2];
+char printUptime;
 
 char *uptime() // Function made to millis() be an optional parameter
 {
@@ -81,9 +82,10 @@ char *uptime(unsigned long milli) {
 //   static int count = 1;
 //   
 //   if (count++ >= 4) {
-//      Serial.print("+++++++++++++++++++++++++");
-//      Serial.print(uptime());
-//      Serial.println("+++++++++++++++++++++++++");
+//      printUptime = 1;
+////      Serial.print("+++++++++++++++++++++++++");
+////      Serial.print(uptime());
+////      Serial.println("+++++++++++++++++++++++++");
 //      count = 1;
 //   }
 //}
@@ -340,13 +342,13 @@ void postToServer(int dev, int16_t value) {
    sprintf(postString, "status=%d&secret=$a8Es#crB469", value);
    data = String(postString);
    sprintf(device, "POST /srv/record-reading?device=%s HTTP/1.1", room);
-   postFirstString = String(device);
+//   postFirstString = String(device);
 
    if (piServer.connected()) {
      // Make a HTTP request:
      wdt_reset();
      Serial.print(room);
-     piServer.println(postFirstString);
+     piServer.println(device);
      Serial.print("\t1");
      piServer.println("Host: 192.168.2.5:3000");
      Serial.print("2");

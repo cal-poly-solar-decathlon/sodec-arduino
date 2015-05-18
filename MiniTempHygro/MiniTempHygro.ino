@@ -102,8 +102,6 @@ uint8_t outOfRange = 0;
 
 void setup () {
    DDRB = 0xFF;
-   pinMode(13, OUTPUT);
-   digitalWrite(13,HIGH);
    digitalWrite(RHT03_DATA,HIGH);
    //   DDRD = 0xFF;
    
@@ -179,5 +177,5 @@ void loop () {
 //   }  
 
    pulseCount = 0;
-   _delay_ms(500);
+   _delay_ms(5000);
 }
