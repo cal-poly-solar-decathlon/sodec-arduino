@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <stdint.h>
 #include <SPI.h>
 #include <Ethernet.h>
@@ -108,7 +109,7 @@ int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
  * sends to ('s')server or ('t')terminal connected by default to serial0
  */
 void ProcessUART1(char where) {
-   char *room = "s-temp-bed";
+//   char *room = "s-temp-bed\0";
    
    Serial1.setTimeout(500);
 //   Serial.print("U1");
@@ -127,9 +128,8 @@ void ProcessUART1(char where) {
       //verify checksum
       if (checksumCheck(*(int16_t *)temperature1, *(uint16_t *)humidity1, checksum)) {
          if (where == 's') {          //send ASCII data to server
-            postToServer(room, *(int16_t *)temperature1);
-            room = "s-hum-bed";
-            postToServer(room, *(int16_t *)humidity1);
+            postToServer(1, *(int16_t *)temperature1);
+            postToServer(2, *(int16_t *)humidity1);
          }
          else {                       //send ASCII data to terminal
             Serial.print("Temperature1 (Bed): ");
@@ -150,7 +150,7 @@ void ProcessUART1(char where) {
  * read from UART2 (same as ProcessUART1)
  */
 void ProcessUART2(char where) {
-   char *room = "s-temp-bath";
+//   char *room = "s-temp-bath\0";
    
    Serial2.setTimeout(500);
 //   Serial.print("U2");
@@ -168,9 +168,8 @@ void ProcessUART2(char where) {
       Serial2.readBytes(&checksum, 1);
       if (checksumCheck(*(int16_t *)temperature2, *(uint16_t *)humidity2, checksum)) {
          if (where == 's') {
-            postToServer(room, *(int16_t *)temperature2);
-            room = "s-hum-bath";
-            postToServer(room, *(int16_t *)humidity2);
+            postToServer(3, *(int16_t *)temperature2);
+            postToServer(4, *(int16_t *)humidity2);
           }
          else {
             Serial.print("Temperature2 (Bath): ");
@@ -191,7 +190,7 @@ void ProcessUART2(char where) {
  * read from UART3 (same as ProcessUART1)
  */
 void ProcessUART3(char where) {
-   char *room = "s-temp-lr";
+//   char *room = "s-temp-lr\0";
    
    Serial3.setTimeout(500);
 //   Serial.print("U3");
@@ -209,9 +208,8 @@ void ProcessUART3(char where) {
       Serial3.readBytes(&checksum, 1);
       if (checksumCheck(*(int16_t *)temperature3, *(uint16_t *)humidity3, checksum)) {
          if (where == 's') {
-            postToServer(room, *(int16_t *)temperature3);
-            room = "s-hum-lr";
-            postToServer(room, *(int16_t *)humidity3);
+            postToServer(5, *(int16_t *)temperature3);
+            postToServer(6, *(int16_t *)humidity3);
          }
          else {
             Serial.print("Temperature3 (LR): ");
@@ -232,7 +230,8 @@ void ProcessUART3(char where) {
  * read from UART0 (same as ProcessUART1)
  */
 void ProcessUART0(char where) {
-   char *room = "s-temp-out";
+//   char *room = "s-temp-out\0";
+   int roomH, roomT;
    
    Serial.setTimeout(500);
    Serial.readBytes(&type0, 1);
@@ -240,6 +239,10 @@ void ProcessUART0(char where) {
       Serial.setTimeout(500);
       Serial.readBytes(&type0, 1);
       if (type0 == 'O') {
+         Serial.setTimeout(500);
+         Serial.readBytes(temperature0, 2);
+      }
+      else if (type0 == 'K') {
          Serial.setTimeout(500);
          Serial.readBytes(temperature0, 2);
       }
@@ -251,18 +254,31 @@ void ProcessUART0(char where) {
          Serial.setTimeout(500);
          Serial.readBytes(humidity0, 2);
       }
+      else if (type0 == 'K') {
+         Serial.setTimeout(500);
+         Serial.readBytes(temperature0, 2);
+      }
    }
    else if (type0 == 'C') {
       Serial.setTimeout(500);
       Serial.readBytes(&type0, 1);
-      if (type0 == 'O') {
+      if (type0 == 'O' || type0 == 'K') {
+         if (type0 == 'O') {
+            roomT = 9;
+            roomH = 0;
+         }
+         else if (type0 == 'K') {
+            roomT = 7;
+            roomH = 8;
+         }
+         else
+            return;
          Serial.setTimeout(500);
          Serial.readBytes(&checksum, 1);
          if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
             if (where == 's') {
-               postToServer(room, *(int16_t *)temperature0);
-               room = "s-hum-out";
-               postToServer(room, *(int16_t *)humidity0);
+               postToServer(roomT, *(int16_t *)temperature0);
+               postToServer(roomH, *(int16_t *)humidity0);
             }
             else {
                Serial.print("Temperature0 (Out): ");
@@ -279,11 +295,45 @@ void ProcessUART0(char where) {
    }
 }
 
-void postToServer(char *room, int16_t value) {
+void postToServer(int dev, int16_t value) {
    char postString[100] = {0};
    char device[100] = {0};
    String data;
    String postFirstString;
+   char room[] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+   
+   switch(dev) {
+   case 1:
+      strcpy(room, "s-temp-bed\0");
+      break;
+   case 2:
+      strcpy(room, "s-hum-bed\0");
+      break;
+   case 3:
+      strcpy(room, "s-temp-bath\0");
+      break;
+   case 4:
+      strcpy(room, "s-hum-bath\0");
+      break;
+   case 5:
+      strcpy(room, "s-temp-lr\0");
+      break;
+   case 6:
+      strcpy(room, "s-hum-lr\0");
+      break;
+   case 7:
+      strcpy(room, "s-temp-kit\0");
+      break;   
+   case 8:
+      strcpy(room, "s-hum-kit\0");
+      break;
+   case 9:
+      strcpy(room, "s-temp-out\0");
+      break;
+   default:
+      strcpy(room, "s-hum-out\0");
+      break;
+   }
 
    Serial.print("#post ");
 //   noInterrupts();
