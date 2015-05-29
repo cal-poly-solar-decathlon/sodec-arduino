@@ -8,16 +8,15 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#define F_CPU 16000000UL
 
 #include <math.h>
 #include <avr/io.h>
+#include <avr/wdt.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
+#define F_CPU 16000000UL
 #define MAIN_DELAY_MS 500
-#define RHT03_DATA_KIT 8
-#define RHT03_DATA_OUT 9
 #define TIMER0_OVER 256
 #define TIMER1_OVER 65536
 #define TEMP_MASK 0xFFFF
@@ -31,14 +30,17 @@
 #define HIGH_ONE 80
 #define LOW_ZERO 20
 #define HIGH_ZERO 32
+#define MAX_PULSE_WAIT 10
 #define RHT03_Read(__pin_x) {\
-   digitalWrite((__pin_x),HIGH);\
-   digitalWrite((__pin_x),LOW);\
+   digitalWrite(__pin_x,HIGH);\
+   digitalWrite(__pin_x,LOW);\
    _delay_ms(2);\
-   digitalWrite((__pin_x),HIGH);\
+   digitalWrite(__pin_x,HIGH);\
    _delay_us(30);\
-   digitalWrite((__pin_x),LOW);\
+   digitalWrite(__pin_x,LOW);\
 }
+#define RHT03_DATA_KIT 8
+#define RHT03_DATA_OUT 12
 
 // global variables
 volatile long overflows;
@@ -53,6 +55,7 @@ uint16_t temperature;
 uint16_t humidity;
 uint8_t checksum;
 uint8_t outOfRange = 0;
+uint32_t delays;
 
 //ISR
 //Function Output Interrupt
@@ -61,14 +64,27 @@ ISR(TIMER1_OVF_vect) {
 }
 
 ISR(PCINT0_vect) {
-   if (PINB & 0x01) {
+   if (PINB & 0x01 || PINB & 0x10) {
       time1 = TCNT1;
-      overflows = 0;
+      Serial.print("-");
+//      overflows = 0;
    }
    else if (pulseCount < MAX_PULSES) {
       pulses[pulseCount++] = TCNT1 - time1;// + overflows * TIMER1_OVER;
    }
 }
+
+//ISR(PCI2_vect) {
+//   if (PIND & 0x80) {
+//      time1 = TCNT1;
+//      Serial.print(".");
+////      overflows = 0;
+//   }
+//   else if (pulseCount < MAX_PULSES) {
+//      pulses[pulseCount++] = TCNT1 - time1;// + overflows * TIMER1_OVER;
+//      Serial.print(";");
+//   }
+//}
 
 //Functions
 void initTimer0(void) {
@@ -86,13 +102,13 @@ void initTimer1(void) {
 }
 
 void RHT03_KIT_init() {
-   PCICR = 1<<PCIE0;
-   PCMSK0 = 1<<PCINT0;
+   PCICR |= 1<<PCIE0;
+   PCMSK0 |= 1<<PCINT0;
 }
 
 void RHT03_OUT_init() {
-   PCICR = 1<<PCIE0;
-   PCMSK0 = 1<<PCINT1;
+   PCICR |= 1<<PCIE0;
+   PCMSK2 |= 1<<PCINT4;
 }
 
 int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
@@ -113,12 +129,13 @@ void setup () {
    DDRB = 0xFF;
    digitalWrite(RHT03_DATA_KIT,HIGH);
    digitalWrite(RHT03_DATA_OUT,HIGH);
-   //   DDRD = 0xFF;
+   DDRD = 0xFF;
    
    initTimer1();                    //initialize timer/counter
    RHT03_KIT_init();      //enable interrupts for kitchen sensor
    RHT03_OUT_init();      //enable interrupts for outside sensor
    Serial.begin(9600);    //initialize USART communication
+   wdt_enable(WDTO_8S);
    
    pulseHigh = pulseWidth = overflows = pulseCount = 0;
    
@@ -132,9 +149,14 @@ void loop () {
    pinMode(RHT03_DATA_KIT, OUTPUT);
    RHT03_Read(RHT03_DATA_KIT)
    pinMode(RHT03_DATA_KIT, INPUT);
+
    
-   while (pulseCount < TRIG_PULSE);
-   
+   delays = 0;
+   while (pulseCount < TRIG_PULSE && delays < MAX_PULSE_WAIT) {
+      _delay_ms(2);
+      ++delays;
+   }
+   wdt_reset();
    checksum = temperature = humidity = outOfRange = 0;
    
    for (i = UNUSED_PULSES; i < pulseCount; ++i) {
@@ -155,21 +177,30 @@ void loop () {
          outOfRange = 1;
       }
    }
-         
-   if (!outOfRange) {
+      
+   if (!outOfRange && delays < MAX_PULSE_WAIT) {
       if (checksumCheck(temperature, humidity, checksum)) {
          Serial.write('T');
          Serial.write('K');
-         Serial.write((uint8_t)(temperature & 0x00FF));
-         Serial.write((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
+         Serial.print((uint8_t)(temperature & 0x00FF));
+         Serial.print(" ");
+         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
          Serial.write('H');
          Serial.write('K');
-         Serial.write((uint8_t)(humidity & 0x00FF));
-         Serial.write((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
+         Serial.print((uint8_t)(humidity & 0x00FF));
+         Serial.print(" ");
+         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
          Serial.write('C');
          Serial.write('K');
-         Serial.write(checksum);
+         Serial.println(checksum);
       }
+      else
+         Serial.println("Bad Checksum K");
+   }
+   else if (delays >= MAX_PULSE_WAIT) {
+      Serial.print(delays);
+      Serial.print(" K ");
+      Serial.println(pulseCount);
    }
 
    pulseCount = 0;
@@ -178,10 +209,16 @@ void loop () {
    pinMode(RHT03_DATA_OUT, OUTPUT);
    RHT03_Read(RHT03_DATA_OUT)
    pinMode(RHT03_DATA_OUT, INPUT);
-   
-   while (pulseCount < TRIG_PULSE);
-   
+  
+   delays = 0;
+   while (pulseCount < TRIG_PULSE && delays < MAX_PULSE_WAIT) {
+      _delay_ms(2);
+      ++delays;
+   }
+   wdt_reset();
    checksum = temperature = humidity = outOfRange = 0;
+   
+//   Serial.println("Checkpoint 2");
    
    for (i = UNUSED_PULSES; i < pulseCount; ++i) {
       digit = pulses[i]/2;
@@ -202,20 +239,30 @@ void loop () {
       }
    }
          
-   if (!outOfRange) {
+   if (!outOfRange && delays < MAX_PULSE_WAIT) {
       if (checksumCheck(temperature, humidity, checksum)) {
          Serial.write('T');
          Serial.write('O');
-         Serial.write((uint8_t)(temperature & 0x00FF));
-         Serial.write((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
+         Serial.print((uint8_t)(temperature & 0x00FF));
+         Serial.print(" ");
+         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
          Serial.write('H');
          Serial.write('O');
-         Serial.write((uint8_t)(humidity & 0x00FF));
-         Serial.write((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
+         Serial.print((uint8_t)(humidity & 0x00FF));
+         Serial.print(" ");
+         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
          Serial.write('C');
          Serial.write('O');
-         Serial.write(checksum);
+         Serial.println(checksum);
       }
+      else
+         Serial.println("Bad Checksum O");
+   }
+   else if (delays >= MAX_PULSE_WAIT) {
+      digitalWrite(RHT03_DATA_OUT, HIGH);
+      Serial.print(delays);
+      Serial.print(" O ");
+      Serial.println(pulseCount);
    }
    pulseCount = 0;
    _delay_ms(MAIN_DELAY_MS);

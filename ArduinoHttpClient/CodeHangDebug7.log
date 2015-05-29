@@ -54098,4 +54098,201 @@ BAD checksum1
 --RESP--
 [7mReally quit and kill all your windows [y/n][27m[K                                                                                               [?1l>[35;1H
 [?1049l[screen is terminating]
-<Tim Ambrosio 3> 
+<Tim Ambrosio 3> screen /dev/tty.usbmodem*
+[?1049h[!p[?3;4l[4l>[4l[?1h=[0m(B[1;35r[H[2J[H[2J----------------------------------RESET------------------------------------
+#setupConnected
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C25.00
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.50
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C25.00
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.60
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C25.00
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.60
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:16.926+++++++++++++++++++++++++
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:32.936+++++++++++++++++++++++++
+----------------------------------RESET------------------------------------
+#setupConnected
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.90
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.80
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:16.753+++++++++++++++++++++++++
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.90
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.80
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.90
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.80
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:32.763+++++++++++++++++++++++++
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.90
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:00:48.890+++++++++++++++++++++++++
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C38.90
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.00
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.00
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.00
+--RESP--
++++++++++++++++++++++++++Uptime 0 days 00:01:05.062+++++++++++++++++++++++++
+HTTP Response
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.40
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C41.90
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.00
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.10
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.40
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C41.80
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.10
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:01:21.170+++++++++++++++++++++++++
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.40
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C41.80
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.10
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.20
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.40
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C41.70
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.10
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.10
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.50
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C41.80
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.10
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.10
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
++++++++++++++++++++++++++Uptime 0 days 00:01:37.276+++++++++++++++++++++++++
+#post s-temp-bath[7C1234567Posted: s-temp-bath[6C24.50
+#post s-hum-bath[8C1234567Posted: s-hum-bath[7C42.00
+--RESP--
+HTTP Response
+#post s-temp-bed[8C1234567Posted: s-temp-bed[7C24.80
+#post s-hum-bed 1234567Posted: s-hum-bed[8C39.10
+--RESP--
+HTTP Response
+#post s-temp-lr 1234567Posted: s-temp-lr[8C25.10
+#post s-hum-lr  1234567Posted: s-hum-lr 39.20
+--RESP--
+HTTP Response
+<Tim Ambrosio 4> 
