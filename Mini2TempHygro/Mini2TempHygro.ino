@@ -40,7 +40,7 @@
    digitalWrite(__pin_x,LOW);\
 }
 #define RHT03_DATA_KIT 8
-#define RHT03_DATA_OUT 12
+#define RHT03_DATA_OUT 3
 
 // global variables
 volatile long overflows;
@@ -64,9 +64,12 @@ ISR(TIMER1_OVF_vect) {
 }
 
 ISR(PCINT0_vect) {
-   if (PINB & 0x01 || PINB & 0x10) {
+  if (PINB & 0x01) {// || PINB & 0x10) {
       time1 = TCNT1;
-      Serial.print("-");
+//      if (PINB & 0x01)
+//         Serial.print("-");
+//      else
+//         Serial.print(".");
 //      overflows = 0;
    }
    else if (pulseCount < MAX_PULSES) {
@@ -74,17 +77,17 @@ ISR(PCINT0_vect) {
    }
 }
 
-//ISR(PCI2_vect) {
-//   if (PIND & 0x80) {
-//      time1 = TCNT1;
+void OutsideSensor() {
+   if (PIND & 0x08) {
+      time1 = TCNT1;
 //      Serial.print(".");
-////      overflows = 0;
-//   }
-//   else if (pulseCount < MAX_PULSES) {
-//      pulses[pulseCount++] = TCNT1 - time1;// + overflows * TIMER1_OVER;
+//      overflows = 0;
+   }
+   else if (pulseCount < MAX_PULSES) {
+      pulses[pulseCount++] = TCNT1 - time1;// + overflows * TIMER1_OVER;
 //      Serial.print(";");
-//   }
-//}
+   }
+}
 
 //Functions
 void initTimer0(void) {
@@ -107,8 +110,9 @@ void RHT03_KIT_init() {
 }
 
 void RHT03_OUT_init() {
-   PCICR |= 1<<PCIE0;
-   PCMSK2 |= 1<<PCINT4;
+//   PCICR |= 1<<PCIE0;
+//   PCMSK0 |= 1<<PCINT4;
+   attachInterrupt(1, OutsideSensor, CHANGE);
 }
 
 int checksumCheck(uint16_t temp, uint16_t humid, char checksum) {
@@ -140,6 +144,8 @@ void setup () {
    pulseHigh = pulseWidth = overflows = pulseCount = 0;
    
    sei();
+//   attachInterrupt(0, KitchenSensor, CHANGE);
+//   attachInterrupt(3, OutsideSensor, CHANGE);
    delay(950);
 }
 
@@ -182,14 +188,16 @@ void loop () {
       if (checksumCheck(temperature, humidity, checksum)) {
          Serial.write('T');
          Serial.write('K');
-         Serial.print((uint8_t)(temperature & 0x00FF));
+         Serial.print(temperature);
+//         Serial.print((uint8_t)(temperature & 0x00FF));
          Serial.print(" ");
-         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
+//         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
          Serial.write('H');
-         Serial.write('K');
-         Serial.print((uint8_t)(humidity & 0x00FF));
+         Serial.write('O');
+         Serial.print(humidity);
+//         Serial.print((uint8_t)(humidity & 0x00FF));
          Serial.print(" ");
-         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
+//         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
          Serial.write('C');
          Serial.write('K');
          Serial.println(checksum);
@@ -201,6 +209,13 @@ void loop () {
       Serial.print(delays);
       Serial.print(" K ");
       Serial.println(pulseCount);
+   }
+   else {
+      Serial.println("outOfRange K");
+//      for (i = 0; i < pulseCount; ++i) {
+//            Serial.print(pulses[i]/2);
+//            Serial.print(' ');
+//      }
    }
 
    pulseCount = 0;
@@ -243,14 +258,16 @@ void loop () {
       if (checksumCheck(temperature, humidity, checksum)) {
          Serial.write('T');
          Serial.write('O');
-         Serial.print((uint8_t)(temperature & 0x00FF));
+         Serial.print(temperature);
+//         Serial.print((uint8_t)(temperature & 0x00FF));
          Serial.print(" ");
-         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
+//         Serial.print((uint8_t)((temperature & 0xFF00) >> BYTE_SIZE));
          Serial.write('H');
          Serial.write('O');
-         Serial.print((uint8_t)(humidity & 0x00FF));
+         Serial.print(humidity);
+//         Serial.print((uint8_t)(humidity & 0x00FF));
          Serial.print(" ");
-         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
+//         Serial.print((uint8_t)((humidity & 0xFF00) >> BYTE_SIZE));
          Serial.write('C');
          Serial.write('O');
          Serial.println(checksum);
@@ -263,6 +280,13 @@ void loop () {
       Serial.print(delays);
       Serial.print(" O ");
       Serial.println(pulseCount);
+   }
+   else {
+      Serial.println("outOfRange O");
+//      for (i = 0; i < pulseCount; ++i) {
+//            Serial.print(pulses[i]/2);
+//            Serial.print(' ');
+//      }
    }
    pulseCount = 0;
    _delay_ms(MAIN_DELAY_MS);

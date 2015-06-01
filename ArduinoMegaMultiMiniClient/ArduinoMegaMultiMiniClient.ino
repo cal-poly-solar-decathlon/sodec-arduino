@@ -134,9 +134,9 @@ void ProcessUART1(char where) {
 //            postToServer(2, *(int16_t *)humidity1);
          }
          else {                       //send ASCII data to terminal
-            Serial.print("Temperature1 (Bed): ");
+            Serial.print("Temperature1 (Bedroom): ");
             Serial.print((*(uint16_t *)temperature1) / 10.0, 1);
-            Serial.print(" °C\tHumidity1 (Bed): ");
+            Serial.print(" C\t\tHumidity1 (Bedroom): ");
             Serial.print((*(uint16_t *)humidity1) / 10.0, 1);
             Serial.print("%\n\r");
          }
@@ -174,9 +174,9 @@ void ProcessUART2(char where) {
 //            postToServer(4, *(int16_t *)humidity2);
           }
          else {
-            Serial.print("Temperature2 (Bath): ");
+            Serial.print("Temperature2 (Bathroom): ");
             Serial.print((*(int16_t *)temperature2) / 10.0, 1);
-            Serial.print(" °C\tHumidity2 (Bath): ");
+            Serial.print(" C\t\tHumidity2 (Bathroom): ");
             Serial.print((*(uint16_t *)humidity2) / 10.0, 1);
             Serial.print("%\n\r");
          }
@@ -214,9 +214,9 @@ void ProcessUART3(char where) {
 //            postToServer(6, *(int16_t *)humidity3);
          }
          else {
-            Serial.print("Temperature3 (LR): ");
+            Serial.print("Temperature3 (Living Room): ");
             Serial.print((*(int16_t *)temperature3) / 10.0, 1);
-            Serial.print(" °C\tHumidity3 (LR): ");
+            Serial.print(" C\tHumidity3 (Living Room): ");
             Serial.print((*(uint16_t *)humidity3) / 10.0, 1);
             Serial.print("%\n\r");
          }
