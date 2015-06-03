@@ -152,40 +152,79 @@ void ProcessUART1(char where) {
  * read from UART2 (same as ProcessUART1)
  */
 void ProcessUART2(char where) {
-//   char *room = "s-temp-bath\0";
+//   char *room = "s-temp-out\0";
+   int roomH, roomT;
    
    Serial2.setTimeout(50);
-//   Serial.print("U2");
    Serial2.readBytes(&type2, 1);
    if (type2 == 'T') {
       Serial2.setTimeout(50);
-      Serial2.readBytes(temperature2, 2);
+      Serial2.readBytes(&type2, 1);
+      if (type2 == 'O' || type2 == 'K') {
+         Serial2.setTimeout(50);
+         Serial2.readBytes(temperature2, 2);
+      }
+//      else if (type0 == 'K') {
+//         Serial2.setTimeout(50);
+//         Serial2.readBytes(temperature2, 2);
+//      }
    }
    else if (type2 == 'H') {
       Serial2.setTimeout(50);
-      Serial2.readBytes(humidity2, 2);
+      Serial2.readBytes(&type2, 1);
+      if (type2 == 'O' || type2 == 'K') {
+         Serial2.setTimeout(50);
+         Serial2.readBytes(humidity2, 2);
+      }
+//      else if (type0 == 'K') {
+//         Serial2.setTimeout(50);
+//         Serial2.readBytes(temperature0, 2);
+//      }
    }
    else if (type2 == 'C') {
       Serial2.setTimeout(50);
-      Serial2.readBytes(&checksum, 1);
-      if (checksumCheck(*(int16_t *)temperature2, *(uint16_t *)humidity2, checksum)) {
-         if (where == 's') {
-//            postToServer(3, *(int16_t *)temperature2);
-//            postToServer(4, *(int16_t *)humidity2);
-          }
-         else {
-            Serial.print("Temperature2 (Bathroom): ");
-            Serial.print((*(int16_t *)temperature2) / 10.0, 1);
-            Serial.print(" C\t\tHumidity2 (Bathroom): ");
-            Serial.print((*(uint16_t *)humidity2) / 10.0, 1);
-            Serial.print("%\n\r");
+      Serial2.readBytes(&type2, 1);
+      if (type2 == 'O' || type2 == 'K') {
+         if (type2 == 'O') {
+            roomT = 9;
+            roomH = 0;
+         }
+         else if (type2 == 'K') {
+            roomT = 7;
+            roomH = 8;
+         }
+         else
+            return;
+         Serial2.setTimeout(50);
+         Serial2.readBytes(&checksum, 1);
+         if (checksumCheck(*(int16_t *)temperature2, *(uint16_t *)humidity2, checksum)) {
+            if (where == 's') {
+//               postToServer(roomT, *(int16_t *)temperature2);
+//               postToServer(roomH, *(int16_t *)humidity2);
+            }
+            else {
+               if (type2 == 'O')
+                  Serial.print("Temperature2 (Outside): ");
+               else if (type2 == 'K')
+                  Serial.print("Temperature2 (Kitchen): ");
+               else
+                  Serial.print("Temperature2 (Unknown): ");
+               Serial.print((*(int16_t *)temperature2) / 10.0, 1);
+               if (type2 == 'O')
+                  Serial.print(" C\t\tHumidity2 (Outside): ");
+               else if (type2 == 'K')
+                  Serial.print(" C\t\tHumidity2 (Kitchen): ");
+               else
+                  Serial.print(" C\t\tHumidity2 (Unknown): ");
+               Serial.print((*(uint16_t *)humidity2) / 10.0, 1);
+               Serial.print("%\n\r");
+            }
+         }
+         else if (where != 's'){
+            Serial.println("BAD Checksum2");
          }
       }
-      else {
-         Serial.println("BAD Checksum2");
-      }
    }
-//   Serial.print("/U2\t");
 }
 
 /* ProcessUART3
@@ -232,69 +271,40 @@ void ProcessUART3(char where) {
  * read from UART0 (same as ProcessUART1)
  */
 void ProcessUART0(char where) {
-//   char *room = "s-temp-out\0";
-   int roomH, roomT;
+//   char *room = "s-temp-bath\0";
    
    Serial.setTimeout(50);
+//   Serial.print("U2");
    Serial.readBytes(&type0, 1);
    if (type0 == 'T') {
       Serial.setTimeout(50);
-      Serial.readBytes(&type0, 1);
-      if (type0 == 'O') {
-         Serial.setTimeout(50);
-         Serial.readBytes(temperature0, 2);
-      }
-      else if (type0 == 'K') {
-         Serial.setTimeout(50);
-         Serial.readBytes(temperature0, 2);
-      }
+      Serial.readBytes(temperature0, 2);
    }
    else if (type0 == 'H') {
       Serial.setTimeout(50);
-      Serial.readBytes(&type0, 1);
-      if (type0 == 'O') {
-         Serial.setTimeout(50);
-         Serial.readBytes(humidity0, 2);
-      }
-      else if (type0 == 'K') {
-         Serial.setTimeout(50);
-         Serial.readBytes(temperature0, 2);
-      }
+      Serial.readBytes(humidity0, 2);
    }
    else if (type0 == 'C') {
       Serial.setTimeout(50);
-      Serial.readBytes(&type0, 1);
-      if (type0 == 'O' || type0 == 'K') {
-         if (type0 == 'O') {
-            roomT = 9;
-            roomH = 0;
-         }
-         else if (type0 == 'K') {
-            roomT = 7;
-            roomH = 8;
-         }
-         else
-            return;
-         Serial.setTimeout(50);
-         Serial.readBytes(&checksum, 1);
-         if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
-            if (where == 's') {
-//               postToServer(roomT, *(int16_t *)temperature0);
-//               postToServer(roomH, *(int16_t *)humidity0);
-            }
-            else {
-               Serial.print("Temperature0 (Out): ");
-               Serial.print((*(int16_t *)temperature0) / 10.0, 1);
-               Serial.print(" °C\tHumidity0 (Out): ");
-               Serial.print((*(uint16_t *)humidity0) / 10.0, 1);
-               Serial.print("%\n\r");
-            }
-         }
-         else if (where != 's'){
-            Serial.println("BAD Checksum0");
+      Serial.readBytes(&checksum, 1);
+      if (checksumCheck(*(int16_t *)temperature0, *(uint16_t *)humidity0, checksum)) {
+         if (where == 's') {
+//            postToServer(3, *(int16_t *)temperature0);
+//            postToServer(4, *(int16_t *)humidity0);
+          }
+         else {
+            Serial.print("Temperature0 (Bathroom): ");
+            Serial.print((*(int16_t *)temperature0) / 10.0, 1);
+            Serial.print(" C\t\tHumidity0 (Bathroom): ");
+            Serial.print((*(uint16_t *)humidity0) / 10.0, 1);
+            Serial.print("%\n\r");
          }
       }
+      else {
+         Serial.println("BAD Checksum0");
+      }
    }
+//   Serial.print("/U2\t");
 }
 
 //void postToServer(int dev, int16_t value) {
@@ -430,12 +440,7 @@ void setup() {
 }
 
 void loop()
-{   
-//   if (Serial.available()) {
-//      ProcessUART('s');      //read temp3 and humidity3 and send to server
-//      wdt_reset();
-//   }
-
+{ 
    if (Timer1.read() > TIMER1_PERIOD) {
       uptimeLoopCount++;
       Timer1.restart();
@@ -450,6 +455,10 @@ void loop()
       uptimeLoopCount = 0;
    }
       
+   if (Serial.available()) {
+      ProcessUART0('t');      //read temp3 and humidity3 and send to server
+      wdt_reset();
+   }
    
    if (Serial1.available()) {
       ProcessUART1('t');      //read temp1 and humidity1 and send to server

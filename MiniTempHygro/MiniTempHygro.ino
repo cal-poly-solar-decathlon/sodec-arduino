@@ -102,6 +102,7 @@ uint16_t humidity;
 uint8_t checksum;
 uint8_t outOfRange = 0;
 uint32_t delays;
+char fromSerial;
 
 void setup () {
    DDRB = 0xFF;
@@ -120,7 +121,10 @@ void setup () {
 
 void loop () {
    int i;
-          
+
+   while (Serial.available())
+      Serial.readBytes(&fromSerial, 1);
+      
    pinMode(RHT03_DATA, OUTPUT);
    RHT03_Read
    pinMode(RHT03_DATA, INPUT);
