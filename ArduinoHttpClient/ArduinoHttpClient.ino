@@ -358,21 +358,13 @@ void postToServer(int dev, int16_t value) {
    if (piServer.connected()) {
      // Make a HTTP request:
      wdt_reset();
-//     Serial.print(room);
      piServer.println(device);
-//     Serial.print("\t1");
      piServer.println("Host: 192.168.2.5:3000");
-//     Serial.print("2");
      piServer.println("Content-Type: application/x-www-form-urlencoded");
-//     Serial.print("3");
      piServer.print("Content-Length: ");
-//     Serial.print("4");
      piServer.println(data.length());
-//     Serial.print("5");
      piServer.println();
-//     Serial.print("6");
      piServer.print(data);
-//     Serial.print("7");
      piServer.println();
      
      Serial.print("Posted: ");
