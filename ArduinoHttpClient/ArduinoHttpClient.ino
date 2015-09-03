@@ -386,7 +386,7 @@ void postToServer(int dev, int16_t value) {
 
 void setupNetworkConnection()
 {
-   Serial.print("#setup");
+   Serial.println("#setup");
 //   delay(1000);
    // start the Ethernet connection:
    //GET RID OF DHCP AND USE STATIC IP
@@ -407,6 +407,14 @@ void setupNetworkConnection()
    }
    
 //   Serial.print("#/setup\t");
+}
+
+void sendReceiveTime() {
+   if (piServer.connected())
+      piServer.println("GET /srv/timestamp");
+      piServer.println("Host: 192.168.1.3:3000");
+      piServer.println();
+   }
 }
 
 void setup() {
@@ -438,6 +446,10 @@ void loop()
       uptimeLoopCount++;
       Timer1.restart();
       wdt_reset();
+   }
+
+   if (uptimeLoopCount > UPTIME_LOG_INCREMENT / 10) {
+      sendReceiveTime();
    }
       
    if (uptimeLoopCount > UPTIME_LOG_INCREMENT) {
