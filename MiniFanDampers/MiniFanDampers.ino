@@ -12,7 +12,8 @@
 //#include "TimerOne.h"
 
 #define F_CPU 16000000UL
-#define MAIN_DELAY_MS 4990
+#define MAIN_DELAY_MS 4990  //5 seconds
+#define DELAY_MULTIPLIER 9  //total 45 seconds
 #define TIMER0_OVER 256
 #define TIMER1_OVER 65536
 #define TEMP_MASK 0xFFFF
@@ -202,6 +203,7 @@ void setup() {
 
 void loop() {
    int i;
+   int waitCount;
    //----------------Read from Kitchen sensor-----------------
    pinMode(RHT03_DATA_KIT, OUTPUT);
    RHT03_Read(RHT03_DATA_KIT)
@@ -342,15 +344,19 @@ void loop() {
 //      }
    }
    pulseCount = 0;
-   _delay_ms(MAIN_DELAY_MS);
-   
-   pcmTemperature = ( (analogRead(THERMOCOUPLE_PIN)*5/1024) - 1.25) / 5 * 10; //tenths of a degree Celcius
-   
-   if (!flushComplete && serverTime > FLUSH_OUTSIDE_TIME && serverTime < ABSORB_INSIDE_TIME) {
-      FlushToOutsideAir();
-      absorbComplete = false;
-   } else if (!absorbComplete && serverTime > ABSORB_INSIDE_TIME)
-      AbsorbInsideHeat();
-      flushComplete = false;
+   waitCount = DELAY_MULTIPLIER;
+   while (waitCount--) {
+     wdt_reset();
+      _delay_ms(MAIN_DELAY_MS);
+      /*
+      pcmTemperature = (uint16_t)( (analogRead(THERMOCOUPLE_PIN)*5/1024) - 1.25) / 5 * 10; //tenths of a degree Celcius
+     
+      if (!flushComplete && serverTime > FLUSH_OUTSIDE_TIME && serverTime < ABSORB_INSIDE_TIME) {
+         FlushToOutsideAir();
+         absorbComplete = false;
+      } else if (!absorbComplete && serverTime > ABSORB_INSIDE_TIME) {
+         AbsorbInsideHeat();
+         flushComplete = false;
+      }   */
    }
 }

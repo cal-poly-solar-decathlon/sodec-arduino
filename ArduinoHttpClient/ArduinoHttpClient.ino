@@ -376,10 +376,14 @@ void postToServer(int dev, int16_t value) {
    else
       Serial.println("Failed to Post");
 
+   delay(1);
    if (piServer.connected() && piServer.available()) {
       Serial.println("--RESP--");
-      while (piServer.connected() && piServer.available())
+      wdt_reset();
+      while (piServer.connected() && piServer.available()) {
          readC = piServer.read();
+         Serial.print(readC);
+      }
    }
 //   interrupts();
 }
@@ -410,10 +414,19 @@ void setupNetworkConnection()
 }
 
 void sendReceiveTime() {
-   if (piServer.connected())
+   if (piServer.connected()) {
       piServer.println("GET /srv/timestamp");
       piServer.println("Host: 192.168.1.3:3000");
       piServer.println();
+   }
+   delay(1);
+   if (piServer.connected() && piServer.available()) {
+      Serial.println("--RESP--");
+      wdt_reset();
+      while (piServer.connected() && piServer.available()) {
+         readC = piServer.read();
+         Serial.print(readC);
+      }
    }
 }
 
@@ -508,11 +521,11 @@ void loop()
    
    // if there are incoming bytes available from server,
    // read them and print them:
-   if (piServer.connected() && piServer.available()) {
-      Serial.println("--RESP--");
-      while (piServer.connected() && piServer.available())
-         readC = piServer.read();
-   }
+//   if (piServer.connected() && piServer.available()) {
+//      Serial.println("--RESP--");
+//      while (piServer.connected() && piServer.available())
+//         readC = piServer.read();
+//   }
    
 
    // if the server's disconnected, stop the piServer:
@@ -522,6 +535,7 @@ void loop()
       piServer.stop();
       
       setupNetworkConnection();
+      wdt_reset();
       
 //      if (++disconnectCount > 9) {
 //         // Output incoming temp and humidity data to the terminal forevermore:
