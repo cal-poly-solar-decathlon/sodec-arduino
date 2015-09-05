@@ -14,6 +14,7 @@
 #include <Ethernet.h>
 #include <avr/wdt.h>
 #include "TimerOne.h"
+#include "Time.h"
 #include <SD.h>
 
 #define TIMER1_PERIOD 1000000
@@ -44,6 +45,7 @@ IPAddress ip(192,168,1,4);
 EthernetClient piServer;
 
 uint32_t uptimeLoopCount;
+uint32_t loopCounter2;
 bool sdCardReady = false;
 char type0,
      type1,
@@ -375,15 +377,32 @@ void postToServer(int dev, int16_t value) {
    }
    else
       Serial.println("Failed to Post");
+      
+   if (!piServer.connected()) {
+      piServer.stop();
+      setupNetworkConnection();
+   }
+   delay(1000);
+   if (!piServer.connected()) {
+      piServer.stop();
+      setupNetworkConnection();
+   }
 
-   delay(1);
-   if (piServer.connected() && piServer.available()) {
+   if (piServer.available()) {
       Serial.println("--RESP--");
       wdt_reset();
-      while (piServer.connected() && piServer.available()) {
+      while (piServer.available()) {
          readC = piServer.read();
          Serial.print(readC);
       }
+      Serial.println();
+   }
+   else {
+      Serial.println("))) NO RESP (((");
+   }
+   if (!piServer.connected()) {
+      piServer.stop();
+      setupNetworkConnection();
    }
 //   interrupts();
 }
@@ -414,19 +433,48 @@ void setupNetworkConnection()
 }
 
 void sendReceiveTime() {
+   String timestampStr;
+   time_t epoch;
    if (piServer.connected()) {
-      piServer.println("GET /srv/timestamp");
+      piServer.println("GET /srv/timestamp HTTP/1.1");
       piServer.println("Host: 192.168.1.3:3000");
       piServer.println();
    }
-   delay(1);
-   if (piServer.connected() && piServer.available()) {
-      Serial.println("--RESP--");
+   if (!piServer.connected()) {
+      piServer.stop();
+      setupNetworkConnection();
+   }
+   delay(1000);
+   if (!piServer.connected()) {
+      piServer.stop();
+      setupNetworkConnection();
+   }
+   if (piServer.available()) {
+      Serial.println("--TIMESTAMP--");
       wdt_reset();
-      while (piServer.connected() && piServer.available()) {
+      while (piServer.available() && readC != '{')    //skip to json start
          readC = piServer.read();
-         Serial.print(readC);
+      while (piServer.available() && readC != ':')    //skip to payload
+         readC = piServer.read();
+      while (piServer.available() && readC != '}') {
+         readC = piServer.read();
+         if (readC != '}')
+            timestampStr += readC;
       }
+      
+      epoch = timestampStr.toInt();
+      Serial.println(epoch);
+      setTime(epoch);
+      adjustTime(-7 * 3600);
+      Serial.print(hour()); Serial.print(" "); Serial.println(minute());
+      uint8_t miniTime = hour() * 10 + minute() / 10;
+      Serial.print(miniTime);
+      Serial2.write(miniTime);
+      while (piServer.available())
+         readC = piServer.read();
+   }
+   else {
+      Serial.println("))) NO TIMESTAMP RESP (((");
    }
 }
 
@@ -457,18 +505,21 @@ void loop()
 {
    if (Timer1.read() > TIMER1_PERIOD) {
       uptimeLoopCount++;
+      loopCounter2++;
       Timer1.restart();
       wdt_reset();
    }
 
-   if (uptimeLoopCount > UPTIME_LOG_INCREMENT / 10) {
-      sendReceiveTime();
+   if (loopCounter2 > UPTIME_LOG_INCREMENT / 2) {
+//      sendReceiveTime();
+      loopCounter2 = 0;
    }
       
    if (uptimeLoopCount > UPTIME_LOG_INCREMENT) {
-      Serial.print("+++++++++++++++++++++++++");
+      sendReceiveTime();
+      Serial.print("+++++++++++++++");
       Serial.print(uptime());
-      Serial.println("+++++++++++++++++++++++++");
+      Serial.println("+++++++++++++++");
       //if pin A0 is high, we have theoretically inserted an SD card
 //      if (PINA & (1<<PA0)) {
 //         // if we have already initialized the card
