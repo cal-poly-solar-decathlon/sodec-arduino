@@ -12,7 +12,7 @@
 //#include "TimerOne.h"
 
 #define F_CPU 16000000UL
-#define MAIN_DELAY_MS 44990
+#define MAIN_DELAY_MS 4990
 #define TIMER0_OVER 256
 #define TIMER1_OVER 65536
 #define TEMP_MASK 0xFFFF
