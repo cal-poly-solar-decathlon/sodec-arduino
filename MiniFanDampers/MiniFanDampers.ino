@@ -12,7 +12,7 @@
 //#include "TimerOne.h"
 
 #define F_CPU 16000000UL
-#define MAIN_DELAY_MS 4990
+#define MAIN_DELAY_MS 44990
 #define TIMER0_OVER 256
 #define TIMER1_OVER 65536
 #define TEMP_MASK 0xFFFF
@@ -38,12 +38,13 @@
 #define RHT03_DATA_KIT 8
 #define RHT03_DATA_OUT 3
 #define FLUSH_OUTSIDE_TIME 20    //2:00 AM
-#define ABSORB_INSIDE_TIME 140   //2:00 PM
+#define ABSORB_INSIDE_TIME 100   //12:00 PM
 #define FAN_RELAY 10
 #define DAMPER_RELAY 11 // ^v These three subject to change
 #define TRANSFORMER_RELAY 12
 #define THERMOCOUPLE_PIN 14
 #define PCM_TRANS_TEMP 230 //Tenths of a degree Celcius
+#define FAN_RUNTIME 20
 
 // global variables
 volatile long overflows;
@@ -149,7 +150,8 @@ void FlushToOutsideAir() {
 //      digitalWrite(DAMPER_RELAY, LOW);
       waitingOnPCM = true;
    }
-   if ( pcmTemperature > (PCM_TRANS_TEMP - 10) && outTemperature < (PCM_TRANS_TEMP - 30) )
+//   if ( pcmTemperature > (PCM_TRANS_TEMP - 10) && outTemperature < (PCM_TRANS_TEMP - 30) )
+   if (serverTime < FLUSH_OUTSIDE_TIME + FAN_RUNTIME)
       digitalWrite(FAN_RELAY, HIGH);
    else {
       digitalWrite(FAN_RELAY, LOW);
@@ -170,7 +172,8 @@ void AbsorbInsideHeat() {
 //      digitalWrite(DAMPER_RELAY, LOW);
       waitingOnPCM = true;
    }
-   if (pcmTemperature < (PCM_TRANS_TEMP + 10) && kitTemperature > (PCM_TRANS_TEMP + 20) )
+//   if (pcmTemperature < (PCM_TRANS_TEMP + 10) && kitTemperature > (PCM_TRANS_TEMP + 20) )
+   if (serverTime < ABSORB_INSIDE_TIME + FAN_RUNTIME)
       digitalWrite(FAN_RELAY, HIGH);
    else { 
       digitalWrite(FAN_RELAY, LOW);
@@ -192,6 +195,7 @@ void setup() {
    wdt_enable(WDTO_8S);
    flushComplete = absorbComplete = false;
    pcmTemperature = 200; //TEST VALUE
+   serverTime = FLUSH_OUTSIDE_TIME + 1; 
    pulseHigh = pulseWidth = overflows = pulseCount = 0;
    
    sei();
@@ -345,11 +349,13 @@ void loop() {
    _delay_ms(MAIN_DELAY_MS);
    
    pcmTemperature = ( (analogRead(THERMOCOUPLE_PIN)*5/1024) - 1.25) / 5 * 10; //tenths of a degree Celcius
+   Serial.print("Thermocouple: ");
+   Serial.println(pcmTemperature);
    
    if (!flushComplete && serverTime > FLUSH_OUTSIDE_TIME && serverTime < ABSORB_INSIDE_TIME) {
       FlushToOutsideAir();
       absorbComplete = false;
-   } else if (!absorbComplete && serverTime > ABSORB_INSIDE_TIME)
+   } else if (!absorbComplete && serverTime > ABSORB_INSIDE_TIME) {
       AbsorbInsideHeat();
       flushComplete = false;
    }
