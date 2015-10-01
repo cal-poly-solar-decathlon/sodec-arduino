@@ -16,6 +16,8 @@
 #include <avr/wdt.h>
 
 #define F_CPU 16000000UL
+#define MAIN_DELAY_MS 5000  //5 seconds
+#define DELAY_MULTIPLIER 9  //45 total seconds
 #define RHT03_DATA 8
 #define TIMER0_OVER 256
 #define TIMER1_OVER 65536
@@ -121,6 +123,7 @@ void setup () {
 
 void loop () {
    int i;
+   int waitCount;
 
    while (Serial.available())
       Serial.readBytes(&fromSerial, 1);
@@ -190,5 +193,9 @@ void loop () {
    }
 
    pulseCount = 0;
-   _delay_ms(5000);
+   waitCount = DELAY_MULTIPLIER;
+   while (waitCount--) {
+      wdt_reset();
+      _delay_ms(MAIN_DELAY_MS);
+   }
 }
