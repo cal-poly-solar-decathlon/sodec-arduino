@@ -39,10 +39,10 @@
 #define RHT03_DATA_KIT 8
 #define RHT03_DATA_OUT 3
 #define FLUSH_OUTSIDE_TIME 20    //2:00 AM
-#define ABSORB_INSIDE_TIME 100   //12:00 PM
-#define FAN_RELAY 10
-#define DAMPER_RELAY 11 // ^v These three subject to change
-#define TRANSFORMER_RELAY 12
+#define ABSORB_INSIDE_TIME 80    //8:00 AM
+#define FAN_RELAY 12
+#define DAMPER_RELAY 11
+#define TRANSFORMER_RELAY 10
 #define THERMOCOUPLE_PIN 14
 #define PCM_TRANS_TEMP 230 //Tenths of a degree Celcius
 #define FAN_RUNTIME 20
@@ -61,9 +61,6 @@ uint8_t checksum;
 uint8_t outOfRange = 0;
 uint32_t delays;
 uint8_t serverTime;
-
-bool flushComplete,
-     absorbComplete;
      
 uint16_t outTemperature;
 uint16_t kitTemperature;
@@ -145,19 +142,15 @@ void FlushToOutsideAir() {
    if (!waitingOnPCM) {
       digitalWrite(TRANSFORMER_RELAY, HIGH);
       digitalWrite(DAMPER_RELAY, HIGH);      //Assuming outside dampers are normally closed and inside dampers are normally open
-      delay(5);
+      delay(10);
       digitalWrite(TRANSFORMER_RELAY, LOW);
-//      _delay_ms(500);
-//      digitalWrite(DAMPER_RELAY, LOW);
       waitingOnPCM = true;
    }
-//   if ( pcmTemperature > (PCM_TRANS_TEMP - 10) && outTemperature < (PCM_TRANS_TEMP - 30) )
-   if (serverTime < FLUSH_OUTSIDE_TIME + FAN_RUNTIME)
+   if ( pcmTemperature > (PCM_TRANS_TEMP - 10) && outTemperature < (PCM_TRANS_TEMP - 30) )
       digitalWrite(FAN_RELAY, HIGH);
    else {
       digitalWrite(FAN_RELAY, LOW);
       waitingOnPCM = false;
-      flushComplete = true;
    }
 }
 
@@ -167,19 +160,15 @@ void AbsorbInsideHeat() {
    if (!waitingOnPCM) {
       digitalWrite(TRANSFORMER_RELAY, HIGH);
       digitalWrite(DAMPER_RELAY, LOW);      //Assuming outside dampers are normally closed and inside dampers are normally open
-      delay(5);
+      delay(10);
       digitalWrite(TRANSFORMER_RELAY, LOW);
-//      _delay_ms(500);
-//      digitalWrite(DAMPER_RELAY, LOW);
       waitingOnPCM = true;
    }
-//   if (pcmTemperature < (PCM_TRANS_TEMP + 10) && kitTemperature > (PCM_TRANS_TEMP + 20) )
-   if (serverTime < ABSORB_INSIDE_TIME + FAN_RUNTIME)
+   if (pcmTemperature < (PCM_TRANS_TEMP + 10) && kitTemperature > (PCM_TRANS_TEMP + 20) )
       digitalWrite(FAN_RELAY, HIGH);
    else { 
       digitalWrite(FAN_RELAY, LOW);
       waitingOnPCM = false;
-      absorbComplete = true;
    }
 }
 
@@ -194,7 +183,6 @@ void setup() {
    RHT03_OUT_init();      //enable interrupts for outside sensor
    Serial.begin(9600);    //initialize USART communication
    wdt_enable(WDTO_8S);
-   flushComplete = absorbComplete = false;
    pcmTemperature = 200; //TEST VALUE
    serverTime = FLUSH_OUTSIDE_TIME + 1; 
    pulseHigh = pulseWidth = overflows = pulseCount = 0;
@@ -355,15 +343,11 @@ void loop() {
       _delay_ms(MAIN_DELAY_MS);
    }
    
-   pcmTemperature = ( (analogRead(THERMOCOUPLE_PIN)*5/1024) - 1.25) / 5 * 10; //tenths of a degree Celcius
-   Serial.print("Thermocouple: ");      //TEMPORARY    MAKE SURE TO REMOVE AFTER DEBUGGING
-   Serial.println(pcmTemperature);      //TEMPORARY    MAKE SURE TO REMOVE AFTER DEBUGGING
-   
-   if (!flushComplete && serverTime > FLUSH_OUTSIDE_TIME && serverTime < ABSORB_INSIDE_TIME) {
+   pcmTemperature = ( ( (double) analogRead(THERMOCOUPLE_PIN)*5/1023) - 1.25) / 0.005 * 10; //tenths of a degree Celcius
+
+   if (serverTime > FLUSH_OUTSIDE_TIME && serverTime < ABSORB_INSIDE_TIME) {
       FlushToOutsideAir();
-      absorbComplete = false;
-   } else if (!absorbComplete && serverTime > ABSORB_INSIDE_TIME) {
+   } else if (serverTime > ABSORB_INSIDE_TIME) {
       AbsorbInsideHeat();
-      flushComplete = false;
    }
 }
